@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="common">
+
+	<sql id="pageTail">
+		<if test="paging !=null">
+			<if test="paging.start !=null and paging.pageSize !=null">
+				limit #{paging.start},#{paging.pageSize}
+			</if>
+		</if>
+	</sql>
+
+	<!-- 分页头部 -->
+	<sql id="pageHead">
+	</sql>
+
+	<!-- 分页尾部 -->
+	<sql id="pageBottom">
+		<include refid="common.pageTail" />
+	</sql>
+
+	<!-- 图表公共映射 -->
+	<!-- <resultMap id="chart" type="com.core.base.web.OVUChart"> <result column="name" 
+		jdbcType="VARCHAR" property="name" /> <result column="value" jdbcType="VARCHAR" 
+		property="value" /> </resultMap> -->
+</mapper>

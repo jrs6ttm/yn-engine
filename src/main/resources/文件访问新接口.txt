@@ -1,0 +1,162 @@
+﻿【http://localhost:8080/ec_engine是我本地地址，用的时候，分别换成learn上和new上的新引擎地址newengine.learn.com，newengine.xuezuowang.com】
+
+1,资料文件上传：
+
+path: http://localhost:8080/ec_engine/fileManager/fileUpload
+
+params: {userId:"zhangll", fileName:"文件名字", file:"文件"}
+
+[注意]参数有顺序：文件file必须放在最后
+
+response: JSON字符串{"fileName":"upload.html","fileSize":"2KB",
+
+			"filePath":"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html",
+
+			"createType":"own","fileType":"html",
+
+			"fileId":"ea2de577-c885-430f-be21-9974c4d1535b"}
+
+
+2,图片文件上传：
+
+path: http://localhost:8080/ec_engine/fileManager/fileUpload
+
+params: {userId:"zhangll", imageSizes:"125m125_75m75", file:"文件"}
+
+[注意]参数有顺序：文件file必须放在最后
+
+response: JSON字符串{"fileName":"1e2533fa828ba61e4a51e5264834970a304e5908.jpg","fileSize":"49KB",
+
+			"filePath":"tangfz\\own\\2017-02\\images\\7c3ccac0-68a5-46dd-a9da-6d874a1dc621.jpg",
+
+			"createType":"own",
+
+			"imageZooms":"[tangfz\\own\\2017-02\\cutImages\\zoom_125m125.jpg, tangfz\\own\\2017-02\\cutImages\\zoom_75m75.jpg]",
+
+			"fileType":"jpg","fileId":"7c3ccac0-68a5-46dd-a9da-6d874a1dc621"}
+
+
+3,富文本文件上传：
+
+path: http://localhost:8080/ec_engine/fileManager/fileUpload
+
+params: {userId:"zhangll", fileId:"57805c20-42a6-49e9-9c9d-bea9426b7a98", fileStr:"富文本字符串内容"}//第一次fileId没有
+
+[注意]参数有顺序：富文本字符串fileStr必须放在最后
+
+response: JSON字符串{"fileName":"upload.html","fileSize":"2KB",
+
+			"filePath":"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html",
+
+			"createType":"own","fileType":"html",
+
+			"fileId":"ea2de577-c885-430f-be21-9974c4d1535b"}
+
+4,文件读取：
+
+path: http://localhost:8080/ec_engine/fileManager/fileRead
+
+params: 形式一：{userId:"zhangll", filePath:"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html"}
+		形式二：{userId:"zhangll", fileId: "ea2de577-c885-430f-be21-9974c4d1535b", createType: "own"}//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件
+
+
+5,富文本文件内容读取：
+
+path: http://localhost:8080/ec_engine/fileManager/fileContentRead
+
+params: 形式一：{userId:"zhangll", filePath:"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html"}
+		形式二：{userId:"zhangll", fileId: "ea2de577-c885-430f-be21-9974c4d1535b", createType: "own"}//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件
+
+
+6,文件复制：
+
+path: http://localhost:8080/ec_engine/fileManager/fileCopy
+
+params: 形式一：{userId:"zhangll", targetName:"生成目标文件.html", filePath:"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html"}
+			  
+			  //createType为"own":自己上传的文件, 为"study":学习过程中产生的文件; 此处createType是文件fileId的
+		形式二：{userId:"zhangll", targetName:"生成目标文件.html", fileId: "ea2de577-c885-430f-be21-9974c4d1535b", createType: "own"}
+
+response: JSON字符串{"filePath":"zhangll\\study\\2017-02\\static\\46d58cff-4304-46a4-8910-925d42ec21e7.html"}
+
+
+7,文件下载：
+
+path: http://localhost:8080/ec_engine/fileManager/fileDownload
+
+params: 形式一：{userId:"zhangll", fileName:"给下载的文件命名.html", filePath:"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html"}
+		形式二：{userId:"zhangll", fileName:"给下载的文件命名.html", fileId: "ea2de577-c885-430f-be21-9974c4d1535b", createType: "own"}//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件
+
+
+8,文件资料记录查询
+
+path: http://localhost:8080/ec_engine/fileManager/getOwnFiles
+//参数不是必须，根据需要
+params: {userId: "", fileId: "", fileName: "", fileType: "", startTime: "", endTime: ""}
+
+response: JSONArray:[
+						{"fileName":"upload.html","fileSize":"2KB",
+			
+						"filePath":"zhangll\\own\\2017-02\\static\\ea2de577-c885-430f-be21-9974c4d1535b.html",
+			
+						"createType":"own","fileType":"html",
+			
+						"fileId":"ea2de577-c885-430f-be21-9974c4d1535b"
+						}
+					]
+
+			
+9, 文件删除
+
+path: http://localhost:8080/ec_engine/fileManager/fileDelete
+
+params: {userId: "", fileId: "", createType: "own"}//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件
+
+response: JSON:{isSucess: true, msg:"删除成功"} 、{isSucess: false, msg:"删除失败"}
+
+
+10, 文件批量删除
+
+path: http://localhost:8080/ec_engine/fileManager/filesBatchDelete
+
+//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件;files为json数组
+params: {userId: "", files: "[{fileId:\"123\", createType:\"own\"}]"}
+
+response: JSON:{isSucess: true, msg:"删除成功"} 、{isSucess: false, msg:"删除失败"}
+
+
+11, 列出文件夹下目录与文件
+
+path: http://localhost:8080/ec_engine/fileManager/fileList
+
+params: {userId: "", filePath: ""}//filePath为文件夹名字
+
+response: [dir1, dir2, xxx.doc,,,]
+
+
+12, 文件保存
+
+path: http://localhost:8080/ec_engine/fileManager/fileUpload
+
+//保存比上传多了fileId和createType
+//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件
+params: {userId:"zhangll", fileName:"文件名字", fileId:"ea2de577-c885-430f-be21-9974c4d1535b", createType:"own", file:"文件"}
+
+[注意]参数有顺序：文件file必须放在最后
+
+response: JSON字符串{"fileId":"ea2de577-c885-430f-be21-9974c4d1535b",
+					isSuccess: true //or false,
+					msg:""
+					}
+	
+			
+13,文件信息更新(比如，重命名)
+
+path: http://localhost:8080/ec_engine/fileManager/fileUpdate
+
+//createType为"own":自己上传的文件, 为"study":学习过程中产生的文件
+params: {userId: "", fileId: "", fileName: ""， createType:"own"}
+
+response: JSON字符串{isSuccess: true //or false,
+					msg:""
+				  }

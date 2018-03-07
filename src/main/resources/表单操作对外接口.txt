@@ -1,0 +1,72 @@
+//---------------------------------------易编操作表单接口 开始------------------------------------------
+
+1,表单列表（页面iframe嵌入）
+
+path: http://localhost:8080/ec_engine/form/list.jsp?userId=zhangll
+
+2,表单列表信息
+
+path: http://localhost:8080/ec_engine/form/getFormList
+
+param: {userId: userId}
+
+response : json数组：
+					[
+						{
+							formId : '',
+							formName : '',
+							description : '',
+							userId : '',
+							userName : '',
+							formStatus : '',
+							formHtml : '', //可把此html渲染到你指定的div里显示，查看
+							formXml : '',
+							
+							createTime : '',
+							lastUpdateTime : ''
+						}
+					]
+
+2,表单编辑（页面iframe嵌入）入口一
+
+path: http://localhost:8080/ec_engine/form/design.jsp?userId=zhangll&formId=8ad1e426-b3da-47c0-9ff0-c3e4d6828d3b
+
+【注】默认编辑的是已存在的表单（新建在表单列表页面），formId缺省时也行，代表新建
+
+入口二：
+表单列表页面有新建表单按钮
+
+3,表单获取(可查看)
+
+path: http://localhost:8080/ec_engine/form/getForm?formId=8ad1e426-b3da-47c0-9ff0-c3e4d6828d3b
+
+response : {
+		formId : '',
+		formName : '',
+		description : '',
+		userId : '',
+		userName : '',
+		formStatus : '',
+		formHtml : '', //可把此html渲染到你指定的div里显示，查看
+		formXml : '',
+		
+		createTime : '',
+		lastUpdateTime : ''
+}
+
+4,表单绑定
+
+path: http://localhost:8080/ec_engine/form/saveFormBind
+
+params : {formId : formId, formName : formName, courseId : courseId, courseName : courseName}
+
+response : 字符串：cId ，（绑定id），为"error"时，说明出错
+
+//---------------------------------------易编操作表单接口 结束------------------------------------------
+
+
+
+
+//---------------------------------------易播操作表单接口 开始------------------------------------------
+
+查看示例：http://localhost:8080/ec_engine/formTest.jsp

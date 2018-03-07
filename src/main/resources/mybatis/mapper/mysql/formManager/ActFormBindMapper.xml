@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.web.formManager.repository.ActFormBindDao" >
+  <resultMap id="BaseResultMap" type="com.web.formManager.entity.ActFormBind" >
+    <id column="cId" property="cId" jdbcType="VARCHAR" />
+    <result column="formId" property="formId" jdbcType="VARCHAR" />
+    <result column="formName" property="formName" jdbcType="VARCHAR" />
+    <result column="courseId" property="courseId" jdbcType="VARCHAR" />
+    <result column="courseName" property="courseName" jdbcType="VARCHAR" />
+    <result column="taskDefineKey" property="taskDefinekey" jdbcType="VARCHAR" />
+    <result column="taskName" property="taskName" jdbcType="VARCHAR" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="userName" property="userName" jdbcType="VARCHAR" />
+    <result column="bindStatus" property="bindStatus" jdbcType="VARCHAR" />
+    <result column="bindTime" property="bindTime" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    cId, formId, formName, courseId, courseName, taskDefineKey, taskName, userId, userName, 
+    bindStatus, bindTime
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from act_form_bind
+    where cId = #{cId,jdbcType=VARCHAR}
+  </select>
+  <select id="getFormBindList" resultMap="BaseResultMap" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+    select 
+    <include refid="Base_Column_List" />
+    from act_form_bind
+    <where>
+    	<if test="cId != null" >
+        	cId = #{cId,jdbcType=VARCHAR}
+        </if>
+        <if test="formId != null" >
+        	and formId = #{formId,jdbcType=VARCHAR}
+        </if>
+        <if test="formName != null" >
+        	and formName like concat(concat("%", #{formName,jdbcType=VARCHAR}), "%")
+        </if>
+        <if test="courseId != null" >
+        	and courseId = #{courseId,jdbcType=VARCHAR}
+        </if>
+        <if test="courseName != null" >
+        	and courseName like concat(concat("%", #{courseName,jdbcType=VARCHAR}), "%")
+        </if>
+        <if test="taskDefineKey != null" >
+        	and taskDefineKey = #{taskDefineKey,jdbcType=VARCHAR}
+        </if>
+        <if test="taskName != null" >
+        	and taskName like concat(concat("%", #{taskName,jdbcType=VARCHAR}), "%")
+        </if>
+        <if test="userId != null" >
+        	and userId = #{userId,jdbcType=VARCHAR}
+        </if>
+        <if test="userName != null" >
+        	and userName like concat(concat("%", #{userName,jdbcType=VARCHAR}), "%")
+        </if>
+    </where>
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from act_form_bind
+    where cId = #{cId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+    insert into act_form_bind (cId, formId, formName, 
+      courseId, courseName, taskDefineKey, 
+      taskName, userId, userName, 
+      bindStatus, bindTime)
+    values (#{cId,jdbcType=VARCHAR}, #{formId,jdbcType=VARCHAR}, #{formName,jdbcType=VARCHAR}, 
+      #{courseId,jdbcType=VARCHAR}, #{courseName,jdbcType=VARCHAR}, #{taskDefinekey,jdbcType=VARCHAR}, 
+      #{taskName,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, 
+      #{bindStatus,jdbcType=VARCHAR}, #{bindTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+    insert into act_form_bind
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="cId != null" >
+        cId,
+      </if>
+      <if test="formId != null" >
+        formId,
+      </if>
+      <if test="formName != null" >
+        formName,
+      </if>
+      <if test="courseId != null" >
+        courseId,
+      </if>
+      <if test="courseName != null" >
+        courseName,
+      </if>
+      <if test="taskDefinekey != null" >
+        taskDefineKey,
+      </if>
+      <if test="taskName != null" >
+        taskName,
+      </if>
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="userName != null" >
+        userName,
+      </if>
+      <if test="bindStatus != null" >
+        bindStatus,
+      </if>
+      <if test="bindTime != null" >
+        bindTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="cId != null" >
+        #{cId,jdbcType=VARCHAR},
+      </if>
+      <if test="formId != null" >
+        #{formId,jdbcType=VARCHAR},
+      </if>
+      <if test="formName != null" >
+        #{formName,jdbcType=VARCHAR},
+      </if>
+      <if test="courseId != null" >
+        #{courseId,jdbcType=VARCHAR},
+      </if>
+      <if test="courseName != null" >
+        #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskDefinekey != null" >
+        #{taskDefinekey,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="bindStatus != null" >
+        #{bindStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="bindTime != null" >
+        #{bindTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+    update act_form_bind
+    <set >
+      <if test="formId != null" >
+        formId = #{formId,jdbcType=VARCHAR},
+      </if>
+      <if test="formName != null" >
+        formName = #{formName,jdbcType=VARCHAR},
+      </if>
+      <if test="courseId != null" >
+        courseId = #{courseId,jdbcType=VARCHAR},
+      </if>
+      <if test="courseName != null" >
+        courseName = #{courseName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskDefinekey != null" >
+        taskDefineKey = #{taskDefinekey,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        taskName = #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        userId = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="bindStatus != null" >
+        bindStatus = #{bindStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="bindTime != null" >
+        bindTime = #{bindTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where cId = #{cId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+    update act_form_bind
+    set formId = #{formId,jdbcType=VARCHAR},
+      formName = #{formName,jdbcType=VARCHAR},
+      courseId = #{courseId,jdbcType=VARCHAR},
+      courseName = #{courseName,jdbcType=VARCHAR},
+      taskDefineKey = #{taskDefinekey,jdbcType=VARCHAR},
+      taskName = #{taskName,jdbcType=VARCHAR},
+      userId = #{userId,jdbcType=VARCHAR},
+      userName = #{userName,jdbcType=VARCHAR},
+      bindStatus = #{bindStatus,jdbcType=VARCHAR},
+      bindTime = #{bindTime,jdbcType=VARCHAR}
+    where cId = #{cId,jdbcType=VARCHAR}
+  </update>
+</mapper>

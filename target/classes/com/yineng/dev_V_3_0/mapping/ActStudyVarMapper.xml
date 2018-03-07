@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yineng.dev_V_3_0.dao.ActStudyVarMapper" >
+  <resultMap id="BaseResultMap" type="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    <id column="varId" property="varId" jdbcType="VARCHAR" />
+    <result column="varType" property="varType" jdbcType="VARCHAR" />
+    <result column="varValue" property="varValue" jdbcType="VARCHAR" />
+    <result column="userId" property="userId" jdbcType="VARCHAR" />
+    <result column="userName" property="userName" jdbcType="VARCHAR" />
+    <result column="taskId" property="taskId" jdbcType="VARCHAR" />
+    <result column="taskName" property="taskName" jdbcType="VARCHAR" />
+    <result column="taskDefineKey" property="taskDefineKey" jdbcType="VARCHAR" />
+    <result column="processInstanceId" property="processInstanceId" jdbcType="VARCHAR" />
+    <result column="createTime" property="createTime" jdbcType="VARCHAR" />
+    <result column="lastUpdateTime" property="lastUpdateTime" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    varId, varType, varValue, userId, userName, taskId, taskName, taskDefineKey, processInstanceId, 
+    createTime, lastUpdateTime
+  </sql>
+  <select id="selectByPrimaryKey" resultType="com.yineng.dev_V_3_0.model.ActStudyVar" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from act_study_var
+    where varId = #{varId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectStudyVarList" resultMap="BaseResultMap" parameterType="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    select 
+    	<include refid="Base_Column_List" />
+    from act_study_var
+    <where>
+    	<if test="varId != null">
+    		varId = #{varId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="varType != null">
+    		and varType = #{varType,jdbcType=VARCHAR}
+    	</if>
+    	<if test="userId != null">
+    		and userId = #{userId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="taskId != null">
+    		and taskId = #{taskId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="taskDefineKey != null">
+    		and taskDefineKey = #{taskDefineKey,jdbcType=VARCHAR}
+    	</if>
+    	<if test="processInstanceId != null">
+    		and processInstanceId = #{processInstanceId,jdbcType=VARCHAR}
+    	</if>
+    </where>
+    order by createTime asc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from act_study_var
+    where varId = #{varId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    insert into act_study_var (varId, varType, varValue, 
+      userId, userName, taskId, 
+      taskName, taskDefineKey, processInstanceId, 
+      createTime, lastUpdateTime)
+    values (#{varId,jdbcType=VARCHAR}, #{varType,jdbcType=VARCHAR}, #{varValue,jdbcType=VARCHAR}, 
+      #{userId,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, 
+      #{taskName,jdbcType=VARCHAR}, #{taskDefineKey,jdbcType=VARCHAR}, #{processInstanceId,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=VARCHAR}, #{lastUpdateTime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    insert into act_study_var
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="varId != null" >
+        varId,
+      </if>
+      <if test="varType != null" >
+        varType,
+      </if>
+      <if test="varValue != null" >
+        varValue,
+      </if>
+      <if test="userId != null" >
+        userId,
+      </if>
+      <if test="userName != null" >
+        userName,
+      </if>
+      <if test="taskId != null" >
+        taskId,
+      </if>
+      <if test="taskName != null" >
+        taskName,
+      </if>
+      <if test="taskDefineKey != null" >
+        taskDefineKey,
+      </if>
+      <if test="processInstanceId != null" >
+        processInstanceId,
+      </if>
+      <if test="createTime != null" >
+        createTime,
+      </if>
+      <if test="lastUpdateTime != null" >
+        lastUpdateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="varId != null" >
+        #{varId,jdbcType=VARCHAR},
+      </if>
+      <if test="varType != null" >
+        #{varType,jdbcType=VARCHAR},
+      </if>
+      <if test="varValue != null" >
+        #{varValue,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null" >
+        #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskDefineKey != null" >
+        #{taskDefineKey,jdbcType=VARCHAR},
+      </if>
+      <if test="processInstanceId != null" >
+        #{processInstanceId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdateTime != null" >
+        #{lastUpdateTime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    update act_study_var
+    <set >
+      <if test="varType != null" >
+        varType = #{varType,jdbcType=VARCHAR},
+      </if>
+      <if test="varValue != null" >
+        varValue = #{varValue,jdbcType=VARCHAR},
+      </if>
+      <if test="userId != null" >
+        userId = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null" >
+        userName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null" >
+        taskId = #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        taskName = #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskDefineKey != null" >
+        taskDefineKey = #{taskDefineKey,jdbcType=VARCHAR},
+      </if>
+      <if test="processInstanceId != null" >
+        processInstanceId = #{processInstanceId,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        createTime = #{createTime,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdateTime != null" >
+        lastUpdateTime = #{lastUpdateTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where varId = #{varId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    update act_study_var
+    set varType = #{varType,jdbcType=VARCHAR},
+      varValue = #{varValue,jdbcType=VARCHAR},
+      userId = #{userId,jdbcType=VARCHAR},
+      userName = #{userName,jdbcType=VARCHAR},
+      taskId = #{taskId,jdbcType=VARCHAR},
+      taskName = #{taskName,jdbcType=VARCHAR},
+      taskDefineKey = #{taskDefineKey,jdbcType=VARCHAR},
+      processInstanceId = #{processInstanceId,jdbcType=VARCHAR},
+      createTime = #{createTime,jdbcType=VARCHAR},
+      lastUpdateTime = #{lastUpdateTime,jdbcType=VARCHAR}
+    where varId = #{varId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateActStudyVar" parameterType="com.yineng.dev_V_3_0.model.ActStudyVar" >
+    update act_study_var
+    <set >
+      <if test="varValue != null" >
+        varValue = #{varValue,jdbcType=VARCHAR},
+      </if>
+      <if test="lastUpdateTime != null" >
+        lastUpdateTime = #{lastUpdateTime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <where>
+      <if test="varId != null" >
+        varId = #{varId,jdbcType=VARCHAR}
+      </if>
+      <if test="varType != null" >
+        and varType = #{varType,jdbcType=VARCHAR}
+      </if>
+      <if test="userId != null" >
+        and userId = #{userId,jdbcType=VARCHAR}
+      </if>
+      <if test="userName != null" >
+        and userName = #{userName,jdbcType=VARCHAR}
+      </if>
+      <if test="taskId != null" >
+        and taskId = #{taskId,jdbcType=VARCHAR}
+      </if>
+      <if test="taskName != null" >
+        and taskName = #{taskName,jdbcType=VARCHAR}
+      </if>
+      <if test="taskDefineKey != null" >
+        and taskDefineKey = #{taskDefineKey,jdbcType=VARCHAR}
+      </if>
+      <if test="processInstanceId != null" >
+        and processInstanceId = #{processInstanceId,jdbcType=VARCHAR}
+      </if>
+    </where>
+  </update>
+</mapper>

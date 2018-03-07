@@ -99,4 +99,40 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
         <property name="annotationClass" value="com.core.base.mybatis.annotation.YNRepository"/>
     </bean>
+    
+    <!-- activiti engine -->
+  <!-- 4种 历史信息级别：
+	  none: 不保存任何历史记录，可以提高系统性能；
+	  activity: 保存所有的流程实例、任务、活动信息；
+	  audit: 也是Activiti的默认级别，保存所有的流程实例、任务、活动、表单属性；
+	  full: 最完整的历史记录，除了包含audit级别的信息之外还能保存详细，例如：流程变量。
+	     对于几种级别根据对功能的要求选择，如果需要日后跟踪详细可以开启full。
+  -->
+  <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+    <property name="processEngineName" value="engine" />
+    <property name="dataSource" ref="dataSource" />
+    <property name="transactionManager" ref="transactionManager" />
+    <property name="databaseSchemaUpdate" value="true" />
+    <property name="jobExecutorActivate" value="true" />
+    <!-- <property name="deploymentResources" value="classpath*:*.bpmn" /> -->
+    <property name="processDefinitionCacheLimit" value="200" />
+    <property name="history" value="full" />
+  </bean>
+
+  <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+    <property name="processEngineConfiguration" ref="processEngineConfiguration" />
+  </bean>
+ 
+  <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+  <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+  <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+
+  <bean id="formService" factory-bean="processEngine" factory-method="getFormService" />
+  <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+  <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />  
+  <!-- <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" /> -->
+
+  
+  <bean id="courseEngine" class="com.yineng.dev_V_3_0.bpmn.CourseEngine" />
+    
 </beans>

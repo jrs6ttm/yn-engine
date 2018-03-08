@@ -11,6 +11,5 @@ public interface ActOwnFileDao extends YNBaseDao<ActOwnFile, String>{
     
     
     List<ActOwnFile> selectOwnFiles(ActOwnFile record);
-    int updateByPrimaryKey(ActOwnFile record);
     
 }

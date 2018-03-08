@@ -69,6 +69,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 //import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.util.FileUtils;
 import com.util.SysLog;
@@ -91,13 +92,13 @@ import com.yineng.dev_V_3_0.service.ICourseOrgService;
 import com.yineng.dev_V_3_0.service.ICourseOrgStructureService;
 import com.yineng.dev_V_3_0.service.ICourseOrgUserService;
 
-//public class Starter implements InitializingBean {
 /**
  * 
  * 业务引擎操作
  * @author zhangLL
  *
  */
+@Service("courseEngine")
 public class CourseEngine {	
 
   @Autowired

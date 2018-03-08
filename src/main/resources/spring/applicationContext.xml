@@ -131,8 +131,5 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
   <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />  
   <!-- <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" /> -->
-
-  
-  <bean id="courseEngine" class="com.yineng.dev_V_3_0.bpmn.CourseEngine" />
     
 </beans>

@@ -36,7 +36,7 @@
     delete from cro_lrnscnorguser
     where LRNSCN_ORG_USER_CID = #{lrnscnOrgUserCid,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.yineng.dev_V_1_0.model.CourseOrgUser" >
+  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.CourseOrgUser" >
     insert into cro_lrnscnorguser (LRNSCN_ORG_USER_CID, SYNID,USER_ID, NAME, 
       SEX, SKILL, DEPT_ID, 
       DEPT_FULL_DES, ORG_ID, LRNSCN_ORG_ID, 
@@ -50,7 +50,7 @@
       #{creatorId,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{lstupdid,jdbcType=VARCHAR}, 
       #{lstupddate,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yineng.dev_V_1_0.model.CourseOrgUser" >
+  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.CourseOrgUser" >
     insert into cro_lrnscnorguser
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="lrnscnOrgUserCid != null" >
@@ -172,7 +172,7 @@
     </trim>
   </insert>
   <!-- 
-  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_1_0.model.CourseOrgUser" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.CourseOrgUser" >
     update cro_lrnscnorguser
     <set >
       <if test="synid != null" >
@@ -233,7 +233,7 @@
     where LRNSCN_ORG_USER_CID = #{lrnscnOrgUserCid,jdbcType=VARCHAR}
   </update>
   -->
-  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_1_0.model.CourseOrgUser" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.CourseOrgUser" >
     update cro_lrnscnorguser
     <set >
       <if test="synid != null" >
@@ -294,7 +294,7 @@
     	</if>
     </where>
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_1_0.model.CourseOrgUser" >
+  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.CourseOrgUser" >
     update cro_lrnscnorguser
     set SYNID = #{synid,jdbcType=VARCHAR},
       USER_ID = #{userId,jdbcType=VARCHAR},

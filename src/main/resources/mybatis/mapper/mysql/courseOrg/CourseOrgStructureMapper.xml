@@ -43,7 +43,7 @@
     delete from cro_lrnscnorgstruct
     where ORG_STRUCTURE_ID = #{orgStructureId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.yineng.dev_V_1_0.model.CourseOrgStructure" >
+  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.CourseOrgStructure" >
     insert into cro_lrnscnorgstruct (ORG_STRUCTURE_ID, PARENT_ID, TREE_NODE_CODE, 
       SORT, CONTEXT_ID, CONTEXT_DES, 
       LEVEL, ISLEAF, COUNT, 
@@ -57,7 +57,7 @@
       #{creatorId,jdbcType=VARCHAR}, #{createDate,jdbcType=VARCHAR}, #{lstupdid,jdbcType=VARCHAR}, 
       #{lstupddate,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yineng.dev_V_1_0.model.CourseOrgStructure" >
+  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.CourseOrgStructure" >
     insert into cro_lrnscnorgstruct
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="orgStructureId != null" >
@@ -166,7 +166,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_1_0.model.CourseOrgStructure" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.CourseOrgStructure" >
     update cro_lrnscnorgstruct
     <set >
       <if test="parentId != null" >
@@ -220,7 +220,7 @@
     </set>
     where ORG_STRUCTURE_ID = #{orgStructureId,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_1_0.model.CourseOrgStructure" >
+  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.CourseOrgStructure" >
     update cro_lrnscnorgstruct
     set PARENT_ID = #{parentId,jdbcType=VARCHAR},
       TREE_NODE_CODE = #{treeNodeCode,jdbcType=VARCHAR},

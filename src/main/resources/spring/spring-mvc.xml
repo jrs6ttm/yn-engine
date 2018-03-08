@@ -67,6 +67,11 @@
 	
 	<!-- 设置静态资源路径 -->
 	<mvc:resources mapping="/res/**" location="/res/" />
+	<mvc:resources mapping="/css/**/" location="/css/" />
+	<mvc:resources mapping="/script/**/" location="/js/" />
+	<mvc:resources mapping="/my_js/**/" location="/my_js/" />
+	<mvc:resources mapping="/form/**/" location="/form/" />
+	<mvc:resources mapping="/fonts/**/" location="/fonts/" />
 	
 	<!-- Default ViewResolver -->
 	<bean id="viewResolver"

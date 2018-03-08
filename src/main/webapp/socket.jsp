@@ -14,7 +14,7 @@
 	    var websocket = null;
 	    var url = "http://localhost:8022/yn-engine/socket/hello";
 	    
-	    function connect(){
+	    function connect_socketjs(){
 	    	if(!url){
 	    		console.log("url缺失!");
 	    		return false;
@@ -78,8 +78,9 @@
 	    	console.log("窗口已关闭!");
 	    	websocket.close();
 	    }
+	    
 	</script>
-	1,<button onclick="connect();">进入连接</button>
+	1,<button onclick="connect_socketjs();">建立socketjs连接</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button onclick="connect_socketio();">建立socket.io连接</button>
 	<br />
 	<br />
 	2,发送消息：<textarea rows="5" cols="10" id="inputMsg" name="inputMsg"></textarea>

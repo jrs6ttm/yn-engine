@@ -78,7 +78,8 @@ import com.web.fileManager.service.IActOwnFileService;
 import com.web.fileManager.service.IActStudyFileService;
 import com.web.formManager.entity.ActForm;
 import com.web.formManager.entity.ActFormRun;
-import com.web.formManager.service.IActFormManagerService;
+import com.web.formManager.service.IActFormRunService;
+import com.web.formManager.service.IActFormService;
 import com.yineng.dev_V_3_0.model.ActStudyComment;
 import com.yineng.dev_V_3_0.model.ActStudyVar;
 import com.yineng.dev_V_3_0.model.CourseOrg;
@@ -139,7 +140,10 @@ public class CourseEngine {
   private IActStudyVarService actStudyVarService;
   
   @Autowired
-  private IActFormManagerService actFormManagerService;
+  private IActFormService actFormService;
+  
+  @Autowired
+  private IActFormRunService actFormRunService;
   
   private String USERNAME = "";//, OCPath="";
   private ServletContext SERVLET_CONTEXT = null;
@@ -990,7 +994,7 @@ public class CourseEngine {
 				  
 				  JSONObject tOutput = new JSONObject(sourceStudyVar.getVarValue());
 				  if(tOutput.getBoolean("requirement")){//需要流转
-					  List<ActFormRun> formRunList = this.actFormManagerService.getFormRunList(
+					  List<ActFormRun> formRunList = actFormRunService.getFormRunList(
 									  new ActFormRun(null, null, null, null,
 													  null, sourceTaskDefKey, null, task.getProcessInstanceId(),
 													  null, null)
@@ -1007,7 +1011,7 @@ public class CourseEngine {
 		  Object templateObj = sourceData.get("template");
 		  if(templateObj instanceof JSONObject){
 			  JSONObject templateData = sourceData.getJSONObject("template");
-			  ActForm actForm = this.actFormManagerService.selectForm(templateData.getString("id"));
+			  ActForm actForm = actFormService.selectByPrimaryKey(templateData.getString("id"));
 			  String newCid = UUID.randomUUID().toString(),
 					  newFormHtml = actForm.getFormHtml();
 			  
@@ -1036,7 +1040,7 @@ public class CourseEngine {
 				    		task.getId(), task.getTaskDefinitionKey(), task.getName(), task.getProcessInstanceId(),
 				    		task.getAssignee(), USERNAME);
 				  
-				  int result2 = this.actFormManagerService.insertFormRunSelective(destformRun);
+				  int result2 = actFormRunService.insertSelective(destformRun);
 				  System.out.println("创建表单实例结果："+result2+" , 类型："+inputWay);
 			  }else{
 				  String errorMsg = "时间："+CourseEngine.getDateStr(null)+" <br />错误：输入类型为 流转表单[actionOutput]，但找不到目标任务【id:"+task.getTaskDefinitionKey()+", name:"+task.getName()+"】的目标流转表单！<br />原因：请检查此任务的表单属性输出actionOutput的数据格式是否正确。<br />【课程实例id:"+task.getProcessInstanceId()+"】";
@@ -1046,7 +1050,7 @@ public class CourseEngine {
 			  }
 		  }else if("template".equals(inputWay)){//表单模板
 			  if(destformRun != null){
-				  int result3 = this.actFormManagerService.insertFormRunSelective(destformRun);
+				  int result3 = actFormRunService.insertSelective(destformRun);
 				  System.out.println("创建表单实例结果："+result3+" , 类型："+inputWay);
 			  }else{
 				  String errorMsg = "时间："+CourseEngine.getDateStr(null)+" <br />错误：输入类型为 表单模板[template]，但找不到目标任务【id:"+task.getTaskDefinitionKey()+", name:"+task.getName()+"】的目标表单模板！<br />原因：请检查此任务的输入表单模板template的数据格式是否正确。<br />【课程实例id:"+task.getProcessInstanceId()+"】";
@@ -1064,7 +1068,7 @@ public class CourseEngine {
 		  if(destformRun != null && sourceformRun != null){//组装表单与流转的属性
 			  
 			  destformRun = this.installForm(sourceformRun, destformRun);
-			  int result1 = this.actFormManagerService.insertFormRunSelective(destformRun);
+			  int result1 = this.actFormRunService.insertSelective(destformRun);
 			  
 			  System.out.println("创建表单实例结果："+result1+" , 类型：[dynamicForm]表单属性流转");
 		  }else{
@@ -1117,7 +1121,7 @@ public class CourseEngine {
 					  
 					  JSONObject tOutput = new JSONObject(sourceStudyVar.getVarValue());
 					  if(tOutput.getBoolean("requirement")){//需要流转
-						  List<ActFormRun> formRunList = this.actFormManagerService.getFormRunList(
+						  List<ActFormRun> formRunList = actFormRunService.getFormRunList(
 										  new ActFormRun(null, null, null, null,
 														  null, sourceTaskDefKey, null, task.getProcessInstanceId(),
 														  null, null)
@@ -1134,7 +1138,7 @@ public class CourseEngine {
 			  Object templateObj = sourceData.get("template");
 			  if(templateObj instanceof JSONObject){
 				  JSONObject templateData = sourceData.getJSONObject("template");
-				  ActForm actForm = this.actFormManagerService.selectForm(templateData.getString("id"));
+				  ActForm actForm = actFormService.selectByPrimaryKey(templateData.getString("id"));
 				  String newCid = UUID.randomUUID().toString(),
 						  newFormHtml = actForm.getFormHtml();
 				  
@@ -1163,7 +1167,7 @@ public class CourseEngine {
 							  
 							  destformRun = this.installForm(sourceformRun, destformRun);
 							  
-							  int result1 = this.actFormManagerService.insertFormRunSelective(destformRun);
+							  int result1 = actFormRunService.insertSelective(destformRun);
 							  System.out.println("创建表单实例结果："+result1+" , 类型：表单属性流转");
 						  }else{
 							  String errorMsg = "时间："+CourseEngine.getDateStr(null)+" <br />错误：输入类型为 流转表单属性，但找不到目标任务【id:"+task.getTaskDefinitionKey()+", name:"+task.getName()+"】的输入表单属性来源，或找不到目标表单！<br />原因：请检查此任务的表单属性输出actionOutput的数据格式与输入表单模板template的数据格式是否正确。<br />【课程实例id:"+task.getProcessInstanceId()+"】";
@@ -1181,7 +1185,7 @@ public class CourseEngine {
 							    		task.getId(), task.getTaskDefinitionKey(), task.getName(), task.getProcessInstanceId(),
 							    		task.getAssignee(), USERNAME);
 							  
-							  int result2 = this.actFormManagerService.insertFormRunSelective(destformRun);
+							  int result2 = actFormRunService.insertSelective(destformRun);
 							  System.out.println("创建表单实例结果："+result2+" , 类型："+inputWay);
 						  }else{
 							  String errorMsg = "时间："+CourseEngine.getDateStr(null)+" <br />错误：输入类型为 流转表单，但找不到目标任务【id:"+task.getTaskDefinitionKey()+", name:"+task.getName()+"】的目标流转表单！<br />原因：请检查此任务的表单属性输出actionOutput的数据格式是否正确。<br />【课程实例id:"+task.getProcessInstanceId()+"】";
@@ -1204,7 +1208,7 @@ public class CourseEngine {
 			  }
 		  }else if("template".equals(inputWay)){
 			  if(destformRun != null){
-				  int result3 = this.actFormManagerService.insertFormRunSelective(destformRun);
+				  int result3 = actFormRunService.insertSelective(destformRun);
 				  System.out.println("创建表单实例结果："+result3+" , 类型："+inputWay);
 			  }else{
 				  String errorMsg = "时间："+CourseEngine.getDateStr(null)+" <br />错误：输入类型为 表单模板，但找不到目标任务【id:"+task.getTaskDefinitionKey()+", name:"+task.getName()+"】的目标表单模板！<br />原因：请检查此任务的输入表单模板template的数据格式是否正确。<br />【课程实例id:"+task.getProcessInstanceId()+"】";
@@ -1623,7 +1627,7 @@ public class CourseEngine {
 		  formRunQuery.setUserId(task.getAssignee());
 		  formRunQuery.setTaskDefineKey(task.getTaskDefinitionKey());
 		  formRunQuery.setProcessInstanceId(task.getProcessInstanceId());
-		  List<ActFormRun> formRunList = this.actFormManagerService.getFormRunList(formRunQuery);
+		  List<ActFormRun> formRunList = actFormRunService.getFormRunList(formRunQuery);
 		  if(formRunList.size() > 0){
 			  ActFormRun tempFormRun = formRunList.get(0);
 			  destData.put("formId", tempFormRun.getcId());
@@ -1986,7 +1990,7 @@ public class CourseEngine {
 			
 		  }else if("form".equals(outputType)){
 			  //先向引擎设置表单里的流程变量
-			  List<ActFormRun> formRunList = this.actFormManagerService.getFormRunList(
+			  List<ActFormRun> formRunList = actFormRunService.getFormRunList(
 																					  new ActFormRun(null, null, null, null,
 																									  null, task.getTaskDefinitionKey(), null, task.getProcessInstanceId(),
 																									  null, null)

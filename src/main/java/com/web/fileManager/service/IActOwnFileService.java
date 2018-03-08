@@ -2,17 +2,10 @@ package com.web.fileManager.service;
 
 import java.util.List;
 
+import com.core.base.mybatis.service.YNBaseService;
 import com.web.fileManager.entity.ActOwnFile;
 
-public interface IActOwnFileService {
+public interface IActOwnFileService extends YNBaseService<ActOwnFile, String>{
 
-	public int deleteByPrimaryKey(String fileid);
-
-	public int insertSelective(ActOwnFile record);
-
-	public ActOwnFile selectByPrimaryKey(String fileid);
-	
 	public List<ActOwnFile> selectOwnFiles(ActOwnFile record);
-
-	public int updateByPrimaryKeySelective(ActOwnFile record);
 }

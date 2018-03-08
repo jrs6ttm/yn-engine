@@ -2,20 +2,12 @@ package com.web.formManager.repository;
 
 import java.util.List;
 
+import com.core.base.mybatis.annotation.YNRepository;
+import com.core.base.mybatis.dao.YNBaseDao;
 import com.web.formManager.entity.ActFormRun;
 
-public interface ActFormRunDao {
-    int deleteByPrimaryKey(String cId);
-
-    int insert(ActFormRun record);
-
-    int insertSelective(ActFormRun record);
-
-    ActFormRun selectByPrimaryKey(String cId);
+@YNRepository
+public interface ActFormRunDao extends YNBaseDao<ActFormRun, String>{
     
     List<ActFormRun> getFormRunList(ActFormRun record);
-
-    int updateByPrimaryKeySelective(ActFormRun record);
-
-    int updateByPrimaryKey(ActFormRun record);
 }

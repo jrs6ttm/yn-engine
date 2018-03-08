@@ -2,21 +2,15 @@ package com.web.fileManager.repository;
 
 import java.util.List;
 
+import com.core.base.mybatis.annotation.YNRepository;
+import com.core.base.mybatis.dao.YNBaseDao;
 import com.web.fileManager.entity.ActOwnFile;
 
-
-public interface ActOwnFileDao {
-    int deleteByPrimaryKey(String fileid);
-
-    int insert(ActOwnFile record);
-
-    int insertSelective(ActOwnFile record);
-
-    ActOwnFile selectByPrimaryKey(String fileid);
+@YNRepository
+public interface ActOwnFileDao extends YNBaseDao<ActOwnFile, String>{
+    
     
     List<ActOwnFile> selectOwnFiles(ActOwnFile record);
-
-    int updateByPrimaryKeySelective(ActOwnFile record);
-
     int updateByPrimaryKey(ActOwnFile record);
+    
 }

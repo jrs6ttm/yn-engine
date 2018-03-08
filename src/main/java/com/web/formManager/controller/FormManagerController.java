@@ -20,14 +20,26 @@ import com.web.formManager.entity.ActForm;
 import com.web.formManager.entity.ActFormAttr;
 import com.web.formManager.entity.ActFormBind;
 import com.web.formManager.entity.ActFormRun;
-import com.web.formManager.service.IActFormManagerService;
+import com.web.formManager.service.IActFormAttrService;
+import com.web.formManager.service.IActFormBindService;
+import com.web.formManager.service.IActFormRunService;
+import com.web.formManager.service.IActFormService;
 
 @Controller
 @RequestMapping("/form")
 public class FormManagerController {
 	
 	@Autowired
-	private IActFormManagerService actFormManagerService;
+	private IActFormAttrService actFormAttrService;
+	
+	@Autowired
+	private IActFormService actFormService;
+	
+	@Autowired
+	private IActFormBindService actFormBindService;
+	
+	@Autowired
+	private IActFormRunService actFormRunService;
 	
 	/**
 	 * 获取日期字符串
@@ -51,7 +63,7 @@ public class FormManagerController {
 	@RequestMapping(value="/deleteFormAttr")
 	public @ResponseBody String deleteFormAttr(@ModelAttribute ActFormAttr record) {
 		
-		int result = actFormManagerService.deleteFormAttr(record);
+		int result = actFormAttrService.deleteFormAttr(record);
 		
 		return result < 0 ? "error" : "success";
 	}
@@ -66,13 +78,13 @@ public class FormManagerController {
 			record.setCreateTime(getDateStr(null, null));
 			record.setLastUpdateTime(record.getCreateTime());
 			
-			int result = actFormManagerService.insertFormAttrSelective(record);
+			int result = actFormAttrService.insertSelective(record);
 			if(result < 0){
 				formAttrId = "error";
 			}
 		}else{
 			record.setLastUpdateTime(getDateStr(null, null));
-			int result = actFormManagerService.updateFormAttrSelective(record);
+			int result = actFormAttrService.updateByPrimaryKeySelective(record);
 			if(result < 0){
 				formAttrId = "error";
 			}
@@ -85,7 +97,7 @@ public class FormManagerController {
 	public @ResponseBody ActFormAttr getFormAttr(HttpServletRequest request) {
 		String attrId = request.getParameter("attrId"); 
 		
-		return actFormManagerService.selectFormAttr(attrId);
+		return actFormAttrService.selectByPrimaryKey(attrId);
 	}
 
 	@RequestMapping(value="/getFormAttrList", produces = {"application/json;charset=UTF-8"}) 
@@ -93,7 +105,7 @@ public class FormManagerController {
 		
 		//String formId = request.getParameter("formId"); 
 		
-		return actFormManagerService.getFormAttrList(record);
+		return actFormAttrService.getFormAttrList(record);
 	}
 
 	
@@ -107,9 +119,9 @@ public class FormManagerController {
 		
 		ActFormAttr actFormAttr = new ActFormAttr();
 		actFormAttr.setFormId(formId);
-		int result = actFormManagerService.deleteFormAttr(actFormAttr);
+		int result = actFormAttrService.deleteFormAttr(actFormAttr);
 		if(result >=0){
-			result2 = actFormManagerService.deleteForm(formId);
+			result2 = actFormService.deleteByPrimaryKey(formId);
 		}
 		
 		return result2 < 0 ? "error" : "success";
@@ -125,13 +137,13 @@ public class FormManagerController {
 			record.setCreateTime(getDateStr(null, null));
 			record.setLastUpdateTime(record.getCreateTime());
 			
-			int result = actFormManagerService.insertFormSelective(record);
+			int result = actFormService.insertSelective(record);
 			if(result < 0){
 				formId = "error";
 			}
 		}else{//update
 			record.setLastUpdateTime(getDateStr(null, null));
-			int result = actFormManagerService.updateFormSelective(record);
+			int result = actFormService.updateByPrimaryKeySelective(record);
 			if(result < 0){
 				formId = "error";
 			}
@@ -146,7 +158,7 @@ public class FormManagerController {
 		//response.setContentType("application/json;charset=utf-8"); 
 		String formId = request.getParameter("formId"); 
 		
-		return actFormManagerService.multiplexForm(formId);
+		return actFormService.multiplexForm(formId);
 	}
 	
 	@RequestMapping(value="/getForm", produces = {"application/json;charset=UTF-8"})  
@@ -155,7 +167,7 @@ public class FormManagerController {
 		//response.setContentType("application/json;charset=utf-8"); 
 		String formId = request.getParameter("formId"); 
 		
-		return actFormManagerService.selectForm(formId);
+		return actFormService.selectByPrimaryKey(formId);
 	}
 	
 	@RequestMapping(value="/checkFormName", produces = {"application/json;charset=UTF-8"})  
@@ -163,7 +175,7 @@ public class FormManagerController {
 		
 		String formName = request.getParameter("formName"); 
 		
-		return actFormManagerService.checkFormName(formName);
+		return actFormService.checkFormName(formName);
 	}
 
 	@RequestMapping(value="/getFormList", produces = {"application/json;charset=UTF-8"}) 
@@ -172,18 +184,12 @@ public class FormManagerController {
 		response.setHeader("Access-Control-Allow-Origin", "*");
 		//response.setContentType("application/json;charset=utf-8"); 
 		
-		return actFormManagerService.getFormList(record);
+		return actFormService.getFormList(record);
 	}
 	
 	//----------------------------------------- form opt end -------------------------------------
 	
 	//----------------------------------------- formBind opt start -------------------------------------
-	
-	public int deleteFormBind(String cid) {
-		return actFormManagerService.deleteFormBind(cid);
-	}
-
-	
 	@RequestMapping(value="/saveFormBind")
 	public @ResponseBody void saveFormBind(HttpServletResponse response, @ModelAttribute ActFormBind record) {
 		String cId = record.getcId();
@@ -192,18 +198,18 @@ public class FormManagerController {
 			record.setcId(cId);;
 			record.setBindStatus("1");
 			record.setBindTime(getDateStr(null, null));
-			int result = actFormManagerService.insertFormBindSelective(record);
+			int result = actFormBindService.insertSelective(record);
 			
 			ActForm actForm = new ActForm();
 			actForm.setFormStatus("1");
 			actForm.setLastUpdateTime(getDateStr(null, null));
-			int result1 = actFormManagerService.updateFormSelective(actForm);
+			int result1 = actFormService.updateByPrimaryKeySelective(actForm);
 			
 			if(result < 0 || result1 < 0){
 				cId = "error";
 			}
 		}else{//update
-			int result = actFormManagerService.updateFormBindSelective(record);
+			int result = actFormBindService.updateByPrimaryKeySelective(record);
 			if(result < 0){
 				cId = "error";
 			}
@@ -224,20 +230,12 @@ public class FormManagerController {
 		}
 	}
 	
-	public ActFormBind selectFormBind(String cid) {
-		return actFormManagerService.selectFormBind(cid);
-	}
-
-	public List<ActFormBind> getFormBindList(@ModelAttribute ActFormBind record) {
-		return actFormManagerService.getFormBindList(record);
-	}
-
 	//----------------------------------------- formBind opt end -------------------------------------
 	
 	//----------------------------------------- formRun opt start -------------------------------------
 	@RequestMapping(value="/deleteFormRun")
 	public @ResponseBody int deleteFormRun(String cid) {
-		return actFormManagerService.deleteFormRun(cid);
+		return actFormRunService.deleteByPrimaryKey(cid);
 	}
 
 	@RequestMapping(value="/saveFormRun")
@@ -249,13 +247,13 @@ public class FormManagerController {
 			record.setCreateTime(getDateStr(null, null));
 			record.setLastUpdateTime(record.getCreateTime());
 			
-			int result = actFormManagerService.insertFormRunSelective(record);
+			int result = actFormRunService.insertSelective(record);
 			if(result < 0){
 				cId = "error";
 			}
 		}else{//update
 			record.setLastUpdateTime(getDateStr(null, null));
-			int result = actFormManagerService.updateFormRunSelective(record);
+			int result = actFormRunService.updateByPrimaryKeySelective(record);
 			if(result < 0){
 				cId = "error";
 			}
@@ -294,12 +292,12 @@ public class FormManagerController {
 		//response.setContentType("application/json;charset=utf-8"); 
 		String cId = request.getParameter("cId"); 
 		
-		return actFormManagerService.selectFormRun(cId);
+		return actFormRunService.selectByPrimaryKey(cId);
 	}
 	
 	@RequestMapping(value="/getFormRunList", produces = {"application/json;charset=UTF-8"})
 	public List<ActFormRun> getFormRunList(@ModelAttribute ActFormRun record) {
-		return actFormManagerService.getFormRunList(record);
+		return actFormRunService.getFormRunList(record);
 	}
 	
 	//----------------------------------------- formRun opt end -------------------------------------

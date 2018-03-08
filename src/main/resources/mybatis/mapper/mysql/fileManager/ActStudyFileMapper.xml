@@ -29,7 +29,7 @@
     from act_study_file
     where fileId = #{fileid,jdbcType=VARCHAR}
   </select>
-  <select id="selectActStudyFile" resultMap="BaseResultMap" parameterType="com.yineng.dev_V_3_0.model.ActStudyFile" >
+  <select id="selectActStudyFile" resultMap="BaseResultMap" parameterType="com.web.fileManager.entity.ActStudyFile" >
     select 
     <include refid="Base_Column_List" />
     from act_study_file
@@ -61,7 +61,7 @@
     delete from act_study_file
     where fileId = #{fileid,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.ActStudyFile" >
+  <insert id="insert" parameterType="com.web.fileManager.entity.ActStudyFile" >
     insert into act_study_file (fileId, filePath, fileName, 
       userId, fileSize, imageZooms, 
       fileType, optType, taskId, 
@@ -75,7 +75,7 @@
       #{flowsource,jdbcType=VARCHAR}, #{isendflow,jdbcType=INTEGER}, #{createtime,jdbcType=VARCHAR}, 
       #{lastupdatetime,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.ActStudyFile" >
+  <insert id="insertSelective" parameterType="com.web.fileManager.entity.ActStudyFile" >
     insert into act_study_file
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="fileid != null" >
@@ -178,7 +178,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.ActStudyFile" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.web.fileManager.entity.ActStudyFile" >
     update act_study_file
     <set >
       <if test="filepath != null" >
@@ -229,7 +229,7 @@
     </set>
     where fileId = #{fileid,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.ActStudyFile" >
+  <update id="updateByPrimaryKey" parameterType="com.web.fileManager.entity.ActStudyFile" >
     update act_study_file
     set filePath = #{filepath,jdbcType=VARCHAR},
       fileName = #{filename,jdbcType=VARCHAR},

@@ -1,15 +1,15 @@
-package com.web.formManager.repository;
+package com.web.formManager.service;
 
 import java.util.List;
 
-import com.core.base.mybatis.annotation.YNRepository;
 import com.core.base.mybatis.dao.YNBaseDao;
 import com.web.formManager.entity.ActForm;
 
-@YNRepository
-public interface ActFormDao extends YNBaseDao<ActForm, String>{
+public interface IActFormService extends YNBaseDao<ActForm, String> {
+	
+    String multiplexForm(String formid);
     
     ActForm checkFormName(String formName);
-    
+
     List<ActForm> getFormList(ActForm record);
 }

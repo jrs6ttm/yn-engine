@@ -25,35 +25,11 @@
     where attrId = #{attrId,jdbcType=VARCHAR}
     order by createTime asc
   </select>
-  <select id="getFormAttrList" resultMap="BaseResultMap" parameterType="com.yineng.dev_V_3_0.model.ActFormAttr" >
-    select 
-    <include refid="Base_Column_List" />
-    from act_form_attr
-    <where>
-    	<if test="attrId != null" >
-        	attrId = #{attrId,jdbcType=VARCHAR}
-        </if>
-        <if test="label != null" >
-        	and label like concat(concat("%", #{label,jdbcType=VARCHAR}), "%")
-        </if>
-        <if test="formId != null" >
-        	and formId = #{formId,jdbcType=VARCHAR}
-        </if>
-    </where>
-    order by createTime asc
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.ActFormAttr" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from act_form_attr
-    <where>
-    	<if test="attrId != null">
-    	 	attrId = #{attrId,jdbcType=VARCHAR}
-    	</if>
-    	<if test="formId != null" >
-        	and formId = #{formId,jdbcType=VARCHAR}
-        </if>
-    </where>
+    where attrId = #{attrId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.ActFormAttr" >
+  <insert id="insert" parameterType="com.web.formManager.entity.ActFormAttr" >
     insert into act_form_attr (attrId, attrName, formId, 
       label, attrType, isFlow, isProcessVar, defaultValue, 
       optionValues, createTime, lastUpdateTime
@@ -63,7 +39,7 @@
       #{optionValues,jdbcType=VARCHAR}, #{createTime,jdbcType=VARCHAR}, #{lastUpdateTime,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.ActFormAttr" >
+  <insert id="insertSelective" parameterType="com.web.formManager.entity.ActFormAttr" >
     insert into act_form_attr
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="attrId != null" >
@@ -136,21 +112,7 @@
       </if>
     </trim>
   </insert>
-  <insert id="insertBatch"  parameterType="java.util.List" >
-    insert into act_form_attr (attrId, attrName, formId, 
-							      label, attrType, isFlow, isProcessVar, defaultValue, 
-							      optionValues, createTime, lastUpdateTime
-							    )
-    values 
-    <foreach collection="list" item="record" separator=",">
-     (
-      #{record.attrId,jdbcType=VARCHAR}, #{record.attrName,jdbcType=VARCHAR}, #{record.formId,jdbcType=VARCHAR}, 
-      #{record.label,jdbcType=VARCHAR}, #{record.attrType,jdbcType=VARCHAR}, #{record.isFlow,jdbcType=VARCHAR}, #{record.isProcessVar,jdbcType=VARCHAR}, #{record.defaultValue,jdbcType=VARCHAR}, 
-      #{record.optionValues,jdbcType=VARCHAR}, #{record.createTime,jdbcType=VARCHAR}, #{record.lastUpdateTime,jdbcType=VARCHAR}
-      )
-    </foreach>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.ActFormAttr" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.web.formManager.entity.ActFormAttr" >
     update act_form_attr
     <set >
       <if test="attrName != null" >
@@ -186,7 +148,7 @@
     </set>
     where attrId = #{attrId,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.ActFormAttr" >
+  <update id="updateByPrimaryKey" parameterType="com.web.formManager.entity.ActFormAttr" >
     update act_form_attr
     set attrName = #{attrName,jdbcType=VARCHAR},
       formId = #{formId,jdbcType=VARCHAR},
@@ -200,4 +162,48 @@
       lastUpdateTime = #{lastUpdateTime,jdbcType=VARCHAR}
     where attrId = #{attrId,jdbcType=VARCHAR}
   </update>
+  
+  <!-- extends -->
+  <select id="getFormAttrList" resultMap="BaseResultMap" parameterType="com.web.formManager.entity.ActFormAttr" >
+    select 
+    <include refid="Base_Column_List" />
+    from act_form_attr
+    <where>
+    	<if test="attrId != null" >
+        	attrId = #{attrId,jdbcType=VARCHAR}
+        </if>
+        <if test="label != null" >
+        	and label like concat(concat("%", #{label,jdbcType=VARCHAR}), "%")
+        </if>
+        <if test="formId != null" >
+        	and formId = #{formId,jdbcType=VARCHAR}
+        </if>
+    </where>
+    order by createTime asc
+  </select>
+  <insert id="insertBatch"  parameterType="java.util.List" >
+    insert into act_form_attr (attrId, attrName, formId, 
+							      label, attrType, isFlow, isProcessVar, defaultValue, 
+							      optionValues, createTime, lastUpdateTime
+							    )
+    values 
+    <foreach collection="list" item="record" separator=",">
+     (
+      #{record.attrId,jdbcType=VARCHAR}, #{record.attrName,jdbcType=VARCHAR}, #{record.formId,jdbcType=VARCHAR}, 
+      #{record.label,jdbcType=VARCHAR}, #{record.attrType,jdbcType=VARCHAR}, #{record.isFlow,jdbcType=VARCHAR}, #{record.isProcessVar,jdbcType=VARCHAR}, #{record.defaultValue,jdbcType=VARCHAR}, 
+      #{record.optionValues,jdbcType=VARCHAR}, #{record.createTime,jdbcType=VARCHAR}, #{record.lastUpdateTime,jdbcType=VARCHAR}
+      )
+    </foreach>
+  </insert>
+  <delete id="deleteFormAttr" parameterType="com.web.formManager.entity.ActFormAttr" >
+    delete from act_form_attr
+    <where>
+    	<if test="attrId != null">
+    	 	attrId = #{attrId,jdbcType=VARCHAR}
+    	</if>
+    	<if test="formId != null" >
+        	and formId = #{formId,jdbcType=VARCHAR}
+        </if>
+    </where>
+  </delete>
 </mapper>

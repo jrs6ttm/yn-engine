@@ -2,20 +2,12 @@ package com.web.fileManager.repository;
 
 import java.util.List;
 
+import com.core.base.mybatis.annotation.YNRepository;
+import com.core.base.mybatis.dao.YNBaseDao;
 import com.web.fileManager.entity.ActStudyFile;
 
-public interface ActStudyFileDao {
-    int deleteByPrimaryKey(String fileid);
-
-    int insert(ActStudyFile record);
-
-    int insertSelective(ActStudyFile record);
-
-    ActStudyFile selectByPrimaryKey(String fileid);
+@YNRepository
+public interface ActStudyFileDao extends YNBaseDao<ActStudyFile, String>{
     
     List<ActStudyFile> selectActStudyFile(ActStudyFile record);
-
-    int updateByPrimaryKeySelective(ActStudyFile record);
-
-    int updateByPrimaryKey(ActStudyFile record);
 }

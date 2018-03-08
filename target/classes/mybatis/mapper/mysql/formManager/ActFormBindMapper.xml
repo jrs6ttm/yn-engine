@@ -24,7 +24,7 @@
     from act_form_bind
     where cId = #{cId,jdbcType=VARCHAR}
   </select>
-  <select id="getFormBindList" resultMap="BaseResultMap" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+  <select id="getFormBindList" resultMap="BaseResultMap" parameterType="com.web.formManager.entity.ActFormBind" >
     select 
     <include refid="Base_Column_List" />
     from act_form_bind
@@ -62,7 +62,7 @@
     delete from act_form_bind
     where cId = #{cId,jdbcType=VARCHAR}
   </delete>
-  <insert id="insert" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+  <insert id="insert" parameterType="com.web.formManager.entity.ActFormBind" >
     insert into act_form_bind (cId, formId, formName, 
       courseId, courseName, taskDefineKey, 
       taskName, userId, userName, 
@@ -72,7 +72,7 @@
       #{taskName,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, 
       #{bindStatus,jdbcType=VARCHAR}, #{bindTime,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+  <insert id="insertSelective" parameterType="com.web.formManager.entity.ActFormBind" >
     insert into act_form_bind
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="cId != null" >
@@ -145,7 +145,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.web.formManager.entity.ActFormBind" >
     update act_form_bind
     <set >
       <if test="formId != null" >
@@ -181,7 +181,7 @@
     </set>
     where cId = #{cId,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.yineng.dev_V_3_0.model.ActFormBind" >
+  <update id="updateByPrimaryKey" parameterType="com.web.formManager.entity.ActFormBind" >
     update act_form_bind
     set formId = #{formId,jdbcType=VARCHAR},
       formName = #{formName,jdbcType=VARCHAR},

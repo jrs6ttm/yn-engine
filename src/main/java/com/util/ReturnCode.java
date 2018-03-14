@@ -12,6 +12,7 @@ public class ReturnCode implements Serializable{
 	public static final Integer FAIL=0;  //请求失败
 	
 	private Integer code;
+	//private String type = "study"; //返回数据类型, study:学习数据, info:通知信息, error:错误信息, end:课程结束
 	private String msg;
 	private Object data;
 	

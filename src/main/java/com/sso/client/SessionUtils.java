@@ -130,8 +130,8 @@ public class SessionUtils {
 	public static RpcUser setSessionUser_test(HttpServletRequest request) {
 		//模拟数据
 		RpcUser user = new RpcUser();
-		user.setID(Seq.createSeqNum()+"");
-        user.setNICKNAME("yn"+user.getID());
+		user.setID(request.getParameter("userId"));
+        user.setNICKNAME(request.getParameter("userName"));
         
 		WebUtils.setSessionAttribute(request, SESSION_USER, user);
 		return user;

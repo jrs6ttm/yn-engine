@@ -12,13 +12,11 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.util.FileUtils;
 import com.util.SysLog;
 import com.web.runtimeCourse.service.impl.CourseEngine;
 import com.yineng.dev_V_3_0.model.ActStudyVar;
@@ -35,81 +33,6 @@ public class CourseController {
 	
 	@Resource
 	public ICourseOrgStructureService courseOrgStructureService;
-	
-	@Autowired
-	private IActStudyVarService actStudyVarService;
-	
-	@RequestMapping(value="/version") 
-    private @ResponseBody String version(){ 
-		FileUtils.getFileRootDir(null);
-		//TEST log
-		String version = "system version:  2.1.0,  update time: 2016-12-15 16:33:20";
-		JSONObject destData = new JSONObject();
-		destData.put("userName", "zhangll");
-		destData.put("password", "123");
-		
-		SysLog.info("zhangll_id", destData.toString(), version);
-		SysLog.error("zhangll_id", destData.toString(), version);
-		
-        return version;
-    }
-	
-	@RequestMapping(value="/{username}/{password}") //用来处理前台的login请求  
-    private @ResponseBody String hello(@PathVariable("username") String username, @PathVariable("password") String password){  
-		JSONObject destData = new JSONObject();
-		destData.put("userName", username);
-		destData.put("password", password);
-		
-		destData.put("jsonO", new JSONObject("{\"test\": \"data\"}"));
-		Object o1 = destData.get("userName");
-		Object o2 = destData.get("jsonO");
-		if(o1 instanceof String){
-			System.out.println("o1 的类型为String.");
-		}else{
-			System.out.println("o1 的类型不为String.");
-		}
-		
-		if(o2 instanceof String){
-			System.out.println("o2 的类型为String.");
-		}else{
-			System.out.println("o2 的类型不为String.");
-		}
-		
-		if(o2 instanceof JSONObject){
-			System.out.println("o1 的类型为JSONObject.");
-		}else{
-			System.out.println("o1 的类型不为JSONObject.");
-		}
-		
-        return "Hello "+username+",Your password is: "+password;  
-          
-    }
-	
-	@RequestMapping(value="/testVar") //用来处理前台的login请求  
-    private @ResponseBody String testVar(){  
-		System.out.println("123");
-		/*
-		ActStudyVar actStudyVar = new ActStudyVar(null, "output_test", "test_value", "zhangll", "zhanglonglong", 
-					"123", "任务", "EC_test", "456");
-		int insertR = this.actStudyVarService.insertSelective(actStudyVar);
-		System.out.println(insertR);
-		*/
-		/*
-		ActStudyVar actStudyVar = new ActStudyVar("32229280-9c88-4b66-9a8d-c0d800687d01", "test_newValue");
-		int updateR = this.actStudyVarService.updateByPrimaryKeySelective(actStudyVar);
-		System.out.println(updateR);
-		System.out.println(actStudyVar.getVarId());
-		
-		ActStudyVar testVar = this.actStudyVarService.selectByPrimaryKey("32229280-9c88-4b66-9a8d-c0d800687d01");
-		System.out.println(testVar);
-		*/
-		ActStudyVar tempVar = new ActStudyVar("output_test", "zhangll", "123", null, "456");
-		List<ActStudyVar> actStudyVarList = this.actStudyVarService.selectActStudyVars(tempVar);
-		System.out.println(actStudyVarList);
-		
-        return "123";  
-          
-    }
 	
 	/**
 	 * 获取用户在一个已组织的课程里的组信息
@@ -292,11 +215,11 @@ public class CourseController {
         SysLog.info(null, null, "study request: "+studyStr);
         
 		JSONObject studyObj = new JSONObject(studyStr);
-		String sendMsg = this.courseEngine.getStudyTasks(request.getServletContext(), studyObj);
+		JSONObject sendMsg = this.courseEngine.getStudyTasks(studyObj);
 		//System.out.println("时间："+CourseEngine.getDateStr(null)+", response to study request.");
 		SysLog.info(null, null, "study response: "+sendMsg);
 		
-        return sendMsg;
+        return sendMsg.toString();
     }
 	
 	@RequestMapping(value="/study_test")  
@@ -306,14 +229,14 @@ public class CourseController {
 		
 		String studyReqData = request.getParameter("studyReqData");
 		JSONObject studyObj = new JSONObject(studyReqData);
-        
-		String sendMsg = this.courseEngine.getStudyTasks(request.getServletContext(), studyObj);
-		System.out.println(sendMsg.toString());
+		
         PrintWriter res = null;
         try {
+        	JSONObject sendMsg = this.courseEngine.getStudyTasks(studyObj);
+    		System.out.println(sendMsg.toString());
         	res = response.getWriter();
-        	res.write(sendMsg);
-		} catch (IOException e) {
+        	res.write(sendMsg.toString());
+		} catch (Exception e) {
 			System.out.println("study响应失败!");
 			e.printStackTrace();
 		}finally{

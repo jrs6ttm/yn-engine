@@ -13,6 +13,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
 import com.util.FileUtils;
 import com.util.ImageUtils;
 import com.util.SysLog;
@@ -50,6 +52,22 @@ public class FileManagerController {
 	@Autowired
 	private IActStudyFileService actStudyFileService;
 	
+	
+	@RequestMapping(value="/fileCreate")  
+    public @ResponseBody String fileCreate(HttpServletRequest request, HttpServletResponse response){
+		Map<String, String> rMap = new HashMap<String, String>();
+		try {
+			String userId = request.getParameter("userId");
+			String targetName = request.getParameter("targetName");
+			
+			String fileRootDir = FileUtils.getFileRootDir();
+			rMap = FileUtils.createFile(fileRootDir, userId, targetName, "docx");
+		}catch(Exception e){
+			System.out.println(e);
+		}
+		
+		return new Gson().toJson(rMap);
+	}
 	
 	/**
 	 * 文件上传
@@ -71,7 +89,7 @@ public class FileManagerController {
 		getServletContext().getInitParameter("");
 		request.getSession().getServletContext().getInitParameter("");
 		*/
-		String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+		String fileRootDir = FileUtils.getFileRootDir();
 		File file_cache = new File(fileRootDir);
 		if (!file_cache.exists()) {  
 			file_cache.mkdirs();  
@@ -533,7 +551,7 @@ public class FileManagerController {
 			}
 			
 			if(errorMsg != null){
-				Map<String, String> file_Map = FileUtils.createFileInstance(request.getServletContext(), userId, inPath, targetName, inLast);
+				Map<String, String> file_Map = FileUtils.createFileInstance(userId, inPath, targetName, inLast);
 				if(file_Map.containsKey("errorMsg")){
 					errorMsg = file_Map.get("errorMsg");
 				}else{
@@ -621,7 +639,7 @@ public class FileManagerController {
 				
 				res.write(errorMsg);
 			}else{*/
-				String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+				String fileRootDir = FileUtils.getFileRootDir();
 				
 				inPath = request.getParameter("filePath");
 				if(inPath == null || "".equals(inPath)){
@@ -710,7 +728,7 @@ public class FileManagerController {
     		response.setCharacterEncoding("utf-8");
     		res = response.getWriter();
     		
-            String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+            String fileRootDir = FileUtils.getFileRootDir();
             
             inPath = request.getParameter("filePath");
 			if(inPath == null || "".equals(inPath)){
@@ -786,7 +804,7 @@ public class FileManagerController {
         
 		PrintWriter res = null;
 		try {
-			String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+			String fileRootDir = FileUtils.getFileRootDir();
 			
 			inPath = request.getParameter("filePath");
 			if(inPath == null || "".equals(inPath)){
@@ -868,7 +886,7 @@ public class FileManagerController {
     public @ResponseBody void fileDelete(HttpServletRequest request, HttpServletResponse response){ 
 		PrintWriter res = null;
 		try {
-			String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+			String fileRootDir = FileUtils.getFileRootDir();
 			
 			String userId = request.getParameter("userId");
 			String fileid = request.getParameter("fileId");
@@ -930,7 +948,7 @@ public class FileManagerController {
     public @ResponseBody void filesBatchDelete(HttpServletRequest request, HttpServletResponse response){ 
 		PrintWriter res = null;
 		try {
-			String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+			String fileRootDir = FileUtils.getFileRootDir();
 			
 			String files = request.getParameter("files");
 			String userId = request.getParameter("userId");
@@ -1016,7 +1034,7 @@ public class FileManagerController {
 		
 		PrintWriter res = null;
 		try {
-			String fileRootDir = FileUtils.getFileRootDir(request.getServletContext());
+			String fileRootDir = FileUtils.getFileRootDir();
 			JSONArray fileLists = FileUtils.listFiles(fileRootDir, filePath);
 	       
 			response.setHeader("Access-Control-Allow-Origin", "*");

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com..web.fileManager.repository.ActStudyFileDao" >
+<mapper namespace="com.web.fileManager.repository.ActStudyFileDao" >
   <resultMap id="BaseResultMap" type="com.web.fileManager.entity.ActStudyFile" >
     <id column="fileId" property="fileid" jdbcType="VARCHAR" />
     <result column="filePath" property="filepath" jdbcType="VARCHAR" />

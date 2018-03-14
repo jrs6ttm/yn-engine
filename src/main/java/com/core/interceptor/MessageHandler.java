@@ -1,12 +1,13 @@
 package com.core.interceptor;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.sso.client.SessionUtils;
 import com.sso.redis.IRpcUserRedisService;
 import com.sso.rpc.RpcUser;
 import com.util.ReturnCode;
+import com.web.runtimeCourse.service.impl.CourseEngine;
 
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
@@ -33,6 +34,9 @@ public class MessageHandler extends TextWebSocketHandler {
 	@Autowired
 	IRpcUserRedisService rpcUserRedisService;
 	
+	@Autowired
+	private CourseEngine courseEngine;
+	
     private static final Hashtable<String, WebSocketSession> socketUserTable = new Hashtable<String, WebSocketSession>();
 
     /**
@@ -43,8 +47,7 @@ public class MessageHandler extends TextWebSocketHandler {
      * @throws Exception
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session)
-            throws Exception {
+    public void afterConnectionEstablished(WebSocketSession session){
     	/*
         System.out.println("afterConnectionEstablished");
         System.out.println("getId:" + session.getId());
@@ -55,10 +58,11 @@ public class MessageHandler extends TextWebSocketHandler {
         */
     	//从session中获取用户
         RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
-    	user = rpcUserRedisService.getUserById(user.getID());
+        //从redis中取用户
+    	//user = rpcUserRedisService.getUserById(user.getID());
         if(user != null ) {
             socketUserTable.put(user.getID(), session);
-            System.out.println("用户 " + user.getNICKNAME() + " 已上线");
+            System.out.println("用户 " + user.getNICKNAME() + " 已进入课堂");
             
             /*
             //这块会实现自己业务，比如，当用户登录后，会把离线消息推送给用户
@@ -66,10 +70,10 @@ public class MessageHandler extends TextWebSocketHandler {
             session.sendMessage(returnMessage);
             */
             
-            logger.debug("DEBUG: 用户 " + user.getNICKNAME() + " 已上线");
-            logger.info("INFO: 用户 " + user.getNICKNAME() + " 已上线");
-            logger.warn("INFO: 用户 " + user.getNICKNAME() + " 已上线");
-            logger.error("ERROR: 用户 " + user.getNICKNAME() + " 已上线");
+            logger.debug("DEBUG: 用户 " + user.getNICKNAME() + " 已进入课堂");
+            logger.info("INFO: 用户 " + user.getNICKNAME() + " 已进入课堂");
+            logger.warn("INFO: 用户 " + user.getNICKNAME() + " 已进入课堂");
+            logger.error("ERROR: 用户 " + user.getNICKNAME() + " 已进入课堂");
         }
     }
 
@@ -82,12 +86,12 @@ public class MessageHandler extends TextWebSocketHandler {
      * @throws Exception
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus){
     	
         //System.out.println("afterConnectionClosed");
         RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
         socketUserTable.remove(user.getID());
-        rpcUserRedisService.delUser(user.getID());
+        //rpcUserRedisService.delUser(user.getID());
         
         System.out.println("用户 "+user.getNICKNAME()+"已退出！");
         System.out.println("剩余在线用户"+socketUserTable.size());
@@ -102,13 +106,16 @@ public class MessageHandler extends TextWebSocketHandler {
      * @throws Exception
      */
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
-
-    	System.out.println("websocket connection closed......");
-        if(session.isOpen()){
-            session.close();
+    public void handleTransportError(WebSocketSession session, Throwable exception){
+    	try {
+	    	System.out.println("websocket connection closed......");
+	        if(session.isOpen()){
+	            session.close();
+	        }
+	        socketUserTable.remove(session);
+    	} catch (Exception e) {
+            e.printStackTrace();
         }
-        socketUserTable.remove(session);
     }
 
     @Override
@@ -124,13 +131,18 @@ public class MessageHandler extends TextWebSocketHandler {
      * @param message
      */
     @Override
-    public void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception{
-    	
-    	RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
-        System.out.println("收到 " + user.getNICKNAME() + "发送的消息:" + message.getPayload());
-        
-        sendMessageToUser(user.getID());
-        
+    public void handleTextMessage(WebSocketSession session, TextMessage message){
+    	try {
+	    	RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
+	    	System.out.println(message.getPayload());
+	    	
+	    	JSONObject studyObj = new JSONObject(message.getPayload());
+	    	JSONObject sendMsg = courseEngine.getStudyTasks(studyObj);
+			
+			sendMessageToUser(user.getID(), sendMsg);
+    	} catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -144,9 +156,9 @@ public class MessageHandler extends TextWebSocketHandler {
      * @return void     
      * @throws 
      */
-    private void sendMessage(WebSocketSession session, ReturnCode returnCode) {
+    private void sendMessage(WebSocketSession session, JSONObject sendMsg) {
         try {
-            TextMessage textMessage =  new TextMessage(new Gson().toJson(returnCode).getBytes("UTF-8"));
+            TextMessage textMessage =  new TextMessage(sendMsg.toString());
             if(session.isOpen()){
                 session.sendMessage(textMessage);
             }
@@ -165,7 +177,7 @@ public class MessageHandler extends TextWebSocketHandler {
      * @return void     
      * @throws 
      */
-    public void sendMessageToUser(String userId)  {
+    public void sendMessageToUser(String userId, JSONObject sendMsg)  {
         WebSocketSession session = socketUserTable.get(userId);
         if(session !=null){
         	/*
@@ -174,6 +186,7 @@ public class MessageHandler extends TextWebSocketHandler {
             //可以有4种值：success,info,warning,danger
             ret.put("style","info");
             */
+        	/*
         	RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
         	
         	JSONObject ret = new JSONObject();
@@ -181,9 +194,9 @@ public class MessageHandler extends TextWebSocketHandler {
             ret.put("msg",  "欢迎 " + user.getNICKNAME()+ "上线!");
             
             ReturnCode returnCode = new ReturnCode(ReturnCode.SUCCESS, "欢迎 " + user.getNICKNAME()+"上线!", ret);
-            
-            sendMessage(session, returnCode);
-            sendMessageToUsers(userId, returnCode);
+            */
+            sendMessage(session, sendMsg);
+            //sendMessageToUsers(userId, returnCode);
         }
     }
    

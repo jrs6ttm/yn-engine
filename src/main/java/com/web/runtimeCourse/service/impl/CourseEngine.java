@@ -147,7 +147,6 @@ public class CourseEngine {
   private IActFormRunService actFormRunService;
   
   private String USERNAME = "";//, OCPath="";
-  private ServletContext SERVLET_CONTEXT = null;
   /**
    * true:课程组织起来学习 , false:课程不组织，独立完成课程
    */
@@ -1436,7 +1435,7 @@ public class CourseEngine {
 		  fileName = targetName;
 	  }
 	  
-	  Map<String, String> file_Map = FileUtils.createFileInstance(SERVLET_CONTEXT, userId, filePath, targetName, last);
+	  Map<String, String> file_Map = FileUtils.createFileInstance(userId, filePath, targetName, last);
 	  if(file_Map.containsKey("errorMsg")){
 		   fileId = "时间："+CourseEngine.getDateStr(null)+
 				    " <br />错误：生成当前任务【id:"+task.getId()+", name:"+task.getName()+"】的预设文件【"+fileName+"】失败!<br />原因："+
@@ -2221,7 +2220,7 @@ public class CourseEngine {
    * 
    */
   //public synchronized String getStudyTasks(String processDefinitionId, String courseInstanceId, String assignee, String taskIdToEnd, JSONObject output){
-  public synchronized String getStudyTasks(ServletContext servletContext, JSONObject dataInfoObj){
+  public JSONObject getStudyTasks(JSONObject dataInfoObj) {
 	  JSONObject studyTasks = new JSONObject(), output = null;
 	  String processDefinitionId = dataInfoObj.getString("processDefinitionId"),
 			courseInstanceId = "",
@@ -2232,8 +2231,6 @@ public class CourseEngine {
 			taskIdToEnd = dataInfoObj.getString("taskId");
 	  
 	  USERNAME = dataInfoObj.getString("userName");
-	  //OCPath = "http://"+dataInfoObj.getString("OCPath");
-	  SERVLET_CONTEXT = servletContext;
 	  
 	  if(dataInfoObj.has("output")){
 		  output = dataInfoObj.getJSONObject("output");
@@ -2280,7 +2277,7 @@ public class CourseEngine {
 		 studyTasks.put("errorMsg", runResult.get("errorMsg"));
 	 }
 	  
-	  return studyTasks.toString();
+	  return studyTasks;
   }
   
   /**

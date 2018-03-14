@@ -56,10 +56,12 @@ public class HandShakeInterceptor extends HttpSessionHandshakeInterceptor {
             if(user == null){
             	return false;
             }
+            
+            /*
             user.setNICKNAME(user.getNICKNAME() + "_redis");
             rpcUserRedisService.cacheUser(user);
             System.out.println("---- 缓存用户 "+user.getNICKNAME()+"到redis. ----");
-            
+            */
             
             return super.beforeHandshake(request, response, wsHandler, attributes);
         }

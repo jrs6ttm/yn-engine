@@ -20,6 +20,8 @@ import javax.servlet.http.HttpSession;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 
+import com.core.interceptor.StartUpServlet;
+
 public class FileUtils {
 	//文件的根路径
 	static String fileRootDir = null;
@@ -145,7 +147,7 @@ public class FileUtils {
 	 * 获取文件存储的根路径
 	 * @return
 	 */
-	public static String getFileRootDir(ServletContext servletContext){
+	public static String getFileRootDir(){
 		if(FileUtils.fileRootDir != null){
 			
 			return FileUtils.fileRootDir;
@@ -154,8 +156,8 @@ public class FileUtils {
 			String os = System.getProperty("os.name");
 			System.out.println("os env: "+os);
 			String fileRootDir = os.toLowerCase().startsWith("win") ? "win_fileRootDir" : "unix_fileRootDir";
-			if(servletContext != null){
-				FileUtils.fileRootDir = servletContext.getInitParameter(fileRootDir);
+			if(StartUpServlet.APPLICATION_SERVLET != null){
+				FileUtils.fileRootDir = StartUpServlet.APPLICATION_SERVLET.getInitParameter(fileRootDir);
 			}else{
 				FileUtils.fileRootDir = System.getProperty(fileRootDir);
 			}
@@ -287,7 +289,7 @@ public class FileUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Map<String, String> createFile(ServletContext servletContext, String fileRootDir, String userId, String targetName, String last) throws IOException{
+	public static Map<String, String> createFile(String fileRootDir, String userId, String targetName, String last) throws IOException{
 		Map<String, String> rMap = new HashMap<String, String>();
 		
 		int create_lastIndex = targetName.lastIndexOf(".");
@@ -297,10 +299,11 @@ public class FileUtils {
 		}else{
 			String matchLast = "doc,docx,ppt,pptx,xls,xlsx,jm";
 			if(matchLast.indexOf(last) > -1){
-				String tPath = File.separator + "template"+ File.separator + last + "." + last;
+				String tPath = StartUpServlet.APPLICATION_URL + "template"+ File.separator + last + "." + last;
 				System.out.println("新建文件，根据 " + tPath);
-				InputStream in = servletContext.getResourceAsStream(tPath);
-				System.out.println("读取文件： " + tPath);
+				//InputStream in = servletContext.getResourceAsStream(tPath);
+				InputStream in = new FileInputStream(new File(tPath));
+				
 				rMap = FileUtils.copyFile(in, userId, targetName, last);
 			}else{
 				File create_file = new File(fileRootDir + File.separator + output_filePath);
@@ -378,13 +381,13 @@ public class FileUtils {
 	 * @param targetName
 	 * @return
 	 */
-	public static Map<String, String> createFileInstance(ServletContext servletContext, String userId, String filePath, String targetName, String last){
+	public static Map<String, String> createFileInstance(String userId, String filePath, String targetName, String last){
 		Map<String, String> file_Map = new HashMap<String, String>(); 
 		
 		try {
-			String fileRootDir = FileUtils.getFileRootDir(servletContext);
+			String fileRootDir = FileUtils.getFileRootDir();
 			if(filePath == null || "".equals(filePath)){//create new file
-				file_Map = FileUtils.createFile(servletContext, fileRootDir, userId, targetName, last);
+				file_Map = FileUtils.createFile(fileRootDir, userId, targetName, last);
 			}else{//copy 
 				file_Map = FileUtils.copyFile(fileRootDir, filePath, userId, targetName, last);
 			}

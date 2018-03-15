@@ -53,17 +53,20 @@ public class FileManagerController {
 	private IActStudyFileService actStudyFileService;
 	
 	
-	@RequestMapping(value="/fileCreate")  
+	@RequestMapping(value="/fileUploadByContent")  
     public @ResponseBody String fileCreate(HttpServletRequest request, HttpServletResponse response){
 		Map<String, String> rMap = new HashMap<String, String>();
 		try {
 			String userId = request.getParameter("userId");
-			String targetName = request.getParameter("targetName");
+			String fileId = request.getParameter("fileId");
+			String fileName = request.getParameter("fileName");
+			String createType = request.getParameter("createType");
+			String fileStr = request.getParameter("fileStr");
 			
-			String fileRootDir = FileUtils.getFileRootDir();
-			rMap = FileUtils.createFile(fileRootDir, userId, targetName, "docx");
+			
+			
 		}catch(Exception e){
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		
 		return new Gson().toJson(rMap);
@@ -136,7 +139,7 @@ public class FileManagerController {
 				ServletFileUpload upload = new ServletFileUpload(factory);
 				upload.setHeaderEncoding(request.getCharacterEncoding());
 				//upload.setSizeMax(0);
-				
+				System.out.println(request.getParameter("userId"));
 				//可以上传多个文件
 				@SuppressWarnings("unchecked")
 				List<FileItem> list = (List<FileItem>)upload.parseRequest(request);

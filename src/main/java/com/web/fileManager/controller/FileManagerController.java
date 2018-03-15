@@ -302,14 +302,16 @@ public class FileManagerController {
 						}
 					}
 				}
-			}
-			
-			//临时处理
-			if(relativePath.contains("videos")){
-				if(!"3pg".equals(last.toLowerCase()) && !"mp4".equals(last.toLowerCase())){
-					errorMsg = "抱歉，暂时不允许上传"+last+"格式的视频文件，请将视频文件转换为3pg或mp4格式后再上传！";
+				
+				//临时处理
+				if(relativePath.contains("videos")){
+					if(!"3pg".equals(last.toLowerCase()) && !"mp4".equals(last.toLowerCase())){
+						errorMsg = "抱歉，暂时不允许上传"+last+"格式的视频文件，请将视频文件转换为3pg或mp4格式后再上传！";
+					}
 				}
 			}
+			
+			
 			if(errorMsg == null){
 				if(fieldName != null){//富文本在线编辑
 					OutputStream out = new FileOutputStream(new File(fileRootDir + File.separator + relativePath));

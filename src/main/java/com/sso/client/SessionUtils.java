@@ -4,13 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.util.Base64Util;
 import com.util.CookieUtils;
 import com.util.ReturnCode;
-import com.util.Seq;
 import com.util.SpringUtils;
 import com.sso.rpc.AuthenticationRpcService;
 import com.sso.rpc.RpcUser;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.util.WebUtils;
 
 /**
@@ -128,10 +128,19 @@ public class SessionUtils {
 	 * @throws 
 	 */
 	public static RpcUser setSessionUser_test(HttpServletRequest request) {
-		//模拟数据
+		String userId = request.getParameter("userId"), 
+				roleCid = request.getParameter("roleCid"), 
+        		groupId = request.getParameter("groupId");
+		
 		RpcUser user = new RpcUser();
-		user.setID(request.getParameter("userId"));
-        user.setNICKNAME(request.getParameter("userName"));
+		user.setId(userId);
+        user.setNickName(request.getParameter("userName"));
+        if(StringUtils.isNotBlank(roleCid)){
+        	user.setRoleCid(roleCid);
+        }
+        if(StringUtils.isNotBlank(groupId)){
+        	user.setGroupId(groupId);
+        }
         
 		WebUtils.setSessionAttribute(request, SESSION_USER, user);
 		return user;

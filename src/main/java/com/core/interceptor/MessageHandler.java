@@ -1,13 +1,12 @@
 package com.core.interceptor;
 
-import com.google.gson.Gson;
 import com.sso.client.SessionUtils;
 import com.sso.redis.IRpcUserRedisService;
 import com.sso.rpc.RpcUser;
-import com.util.ReturnCode;
 import com.web.runtimeCourse.service.impl.CourseEngine;
 
 import org.activiti.engine.impl.util.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.CloseStatus;
@@ -61,19 +60,20 @@ public class MessageHandler extends TextWebSocketHandler {
         //从redis中取用户
     	//user = rpcUserRedisService.getUserById(user.getID());
         if(user != null ) {
-            socketUserTable.put(user.getID(), session);
-            System.out.println("用户 " + user.getNICKNAME() + " 已进入课堂");
+            socketUserTable.put(user.getId(), session);
+            System.out.println("用户 " + user.getNickName() + " 已进入课堂");
             
             /*
             //这块会实现自己业务，比如，当用户登录后，会把离线消息推送给用户
             TextMessage returnMessage = new TextMessage("你将收到的离线");
             session.sendMessage(returnMessage);
             */
-            
-            logger.debug("DEBUG: 用户 " + user.getNICKNAME() + " 已进入课堂");
-            logger.info("INFO: 用户 " + user.getNICKNAME() + " 已进入课堂");
-            logger.warn("INFO: 用户 " + user.getNICKNAME() + " 已进入课堂");
-            logger.error("ERROR: 用户 " + user.getNICKNAME() + " 已进入课堂");
+            /*
+            logger.debug("DEBUG: 用户 " + user.getNickName() + " 已进入课堂");
+            logger.info("INFO: 用户 " + user.getNickName() + " 已进入课堂");
+            logger.warn("INFO: 用户 " + user.getNickName() + " 已进入课堂");
+            logger.error("ERROR: 用户 " + user.getNickName() + " 已进入课堂");
+            */
         }
     }
 
@@ -87,13 +87,12 @@ public class MessageHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus){
-    	
         //System.out.println("afterConnectionClosed");
         RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
-        socketUserTable.remove(user.getID());
+        socketUserTable.remove(user.getId());
         //rpcUserRedisService.delUser(user.getID());
         
-        System.out.println("用户 "+user.getNICKNAME()+"已退出！");
+        System.out.println("用户 "+user.getNickName()+"已退出！");
         System.out.println("剩余在线用户"+socketUserTable.size());
     }
     
@@ -122,7 +121,7 @@ public class MessageHandler extends TextWebSocketHandler {
     public boolean supportsPartialMessages() {
         return false;
     }
-
+    
     /**
      * 
      * @Title: handleTextMessage 
@@ -133,16 +132,59 @@ public class MessageHandler extends TextWebSocketHandler {
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage message){
     	try {
-	    	RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
 	    	System.out.println(message.getPayload());
 	    	
 	    	JSONObject studyObj = new JSONObject(message.getPayload());
 	    	JSONObject sendMsg = courseEngine.getStudyTasks(studyObj);
 			
-			sendMessageToUser(user.getID(), sendMsg);
+	    	sendCourseData(session, studyObj, sendMsg);
+			//sendMessageToUser(user.getID(), sendMsg);
     	} catch (Exception e) {
+    		logger.error("ERROR: handleTextMessage时出现错误！");
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * 
+     * @Title: sendCourseData 
+     * @Description: 将课程数据推送给学生
+     * @author 张龙龙
+     * @date 2018年3月18日 下午2:14:39
+     * @param @param session
+     * @param @param studyObj
+     * @param @param sendMsg     
+     * @return void     
+     * @throws 
+     */
+    public void sendCourseData(WebSocketSession session, JSONObject studyObj, JSONObject sendMsg){
+    	RpcUser user = (RpcUser)session.getAttributes().get(SessionUtils.SESSION_USER);
+    	//未组织课程
+    	if(!studyObj.has("courseOrgId") || StringUtils.isBlank(studyObj.getString("courseOrgId"))){
+    		sendMessageToUser(user.getId(), sendMsg);
+    	}else{//组织课程
+    		if("end".equals(sendMsg.getString("courseStatus"))){
+    			JSONObject sendObj = new JSONObject();
+    			sendObj.put("infoMsg", "恭喜，您的课程学习完了!");
+    			sendMessageToGroup(studyObj.getString("groupId"), sendObj);
+    		}else{
+    			if(sendMsg.has("errorMsg") || sendMsg.has("infoMsg")){
+    				sendMessageToUser(user.getId(), sendMsg);
+    			}else{
+        			sendMessageToUser(user.getId(), sendMsg);
+        			
+        			if(studyObj.has("taskId") && StringUtils.isNotBlank(studyObj.getString("taskId"))){
+        				JSONObject sendObj = new JSONObject();
+        				if(sendMsg.has("studyMsg")){
+        					sendObj.put("infoMsg", studyObj.getString("userName") + "完成了本任务！");
+        				}else{
+        					sendObj.put("taskMsg", "你有新任务了！");
+        				}
+        				sendMessageToRole(user.getId(), studyObj.getString("roleCid"), sendObj);
+        			}
+        		}
+    		} 
+    	}
     }
     
     /**
@@ -163,6 +205,7 @@ public class MessageHandler extends TextWebSocketHandler {
                 session.sendMessage(textMessage);
             }
         } catch (IOException e) {
+        	logger.error("ERROR: sendMessage时出现错误！");
             e.printStackTrace();
         }
     }
@@ -202,6 +245,77 @@ public class MessageHandler extends TextWebSocketHandler {
    
     /**
      * 
+     * @Title: sendMessageToRole 
+     * @Description: 给指定角色的人员发送消息
+     * @author 张龙龙
+     * @date 2018年3月18日 下午3:47:47
+     * @param @param exceptUserId
+     * @param @param roleCid
+     * @param @param sendMsg     
+     * @return void     
+     * @throws 
+     */
+    public void sendMessageToRole(String exceptUserId, String roleCid, JSONObject sendMsg) {
+        try {
+        	TextMessage textMessage =  new TextMessage(sendMsg.toString());
+        	
+        	Iterator<Entry<String, WebSocketSession>> iter = socketUserTable.entrySet().iterator();
+        	WebSocketSession wSocket = null;
+        	RpcUser user = null;
+        	while (iter.hasNext()) {
+        		Entry<String, WebSocketSession> entry =  iter.next();
+        		String key = entry.getKey();
+        		wSocket = entry.getValue();
+        		user = (RpcUser)wSocket.getAttributes().get(SessionUtils.SESSION_USER);
+	        	if (wSocket.isOpen() && (StringUtils.isBlank(exceptUserId) || !key.equals(exceptUserId))) {
+	        		if(StringUtils.isNotBlank(roleCid) && StringUtils.isNotBlank(user.getRoleCid()) && roleCid.equals(user.getRoleCid())){
+	        			wSocket.sendMessage(textMessage);
+	        		}
+	            }
+        	}
+        	
+        } catch (IOException e) {
+        	logger.error("ERROR: sendMessageToRole时出现错误！");
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 
+     * @Title: sendMessageToGroup 
+     * @Description: 给指定的小组发送消息
+     * @author 张龙龙
+     * @date 2018年3月18日 下午3:50:31
+     * @param @param groupCid
+     * @param @param sendMsg     
+     * @return void     
+     * @throws 
+     */
+    public void sendMessageToGroup(String groupCid, JSONObject sendMsg) {
+        try {
+        	TextMessage textMessage =  new TextMessage(sendMsg.toString());
+        	
+        	Iterator<Entry<String, WebSocketSession>> iter = socketUserTable.entrySet().iterator();
+        	WebSocketSession wSocket = null;
+        	RpcUser user = null;
+        	while (iter.hasNext()) {
+        		Entry<String, WebSocketSession> entry =  iter.next();
+        		//String key = entry.getKey();
+        		wSocket = entry.getValue();
+        		user = (RpcUser)wSocket.getAttributes().get(SessionUtils.SESSION_USER);
+	        	if (wSocket.isOpen() && StringUtils.isNotBlank(groupCid) && StringUtils.isNotBlank(user.getGroupId()) && groupCid.equals(user.getGroupId())){
+	        			wSocket.sendMessage(textMessage);
+	        	}
+        	}
+        	
+        } catch (IOException e) {
+        	logger.error("ERROR: sendMessageToGroup时出现错误！");
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * 
      * @Title: sendMessageToUsers 
      * @Description: 给除exceptUserId外的所有在线用户发送消息
      * @author 张龙龙
@@ -211,9 +325,9 @@ public class MessageHandler extends TextWebSocketHandler {
      * @return void     
      * @throws 
      */
-    public void sendMessageToUsers(String exceptUserId, ReturnCode returnCode) {
+    public void sendMessageToUsers(String exceptUserId, JSONObject sendMsg) {
         try {
-        	TextMessage textMessage =  new TextMessage(new Gson().toJson(returnCode).getBytes("UTF-8"));
+        	TextMessage textMessage =  new TextMessage(sendMsg.toString());
         	
         	Iterator<Entry<String, WebSocketSession>> iter = socketUserTable.entrySet().iterator();
         	while (iter.hasNext()) {
@@ -226,6 +340,7 @@ public class MessageHandler extends TextWebSocketHandler {
         	}
         	
         } catch (IOException e) {
+        	logger.error("ERROR: sendMessageToUsers时出现错误！");
             e.printStackTrace();
         }
     }

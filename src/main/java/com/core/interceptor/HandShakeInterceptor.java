@@ -4,6 +4,7 @@ import com.sso.client.SessionUtils;
 import com.sso.redis.IRpcUserRedisService;
 import com.sso.rpc.RpcUser;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -12,6 +13,8 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 
@@ -38,19 +41,6 @@ public class HandShakeInterceptor extends HttpSessionHandshakeInterceptor {
         if(request instanceof ServletServerHttpRequest) {
             ServletServerHttpRequest servletRequest = (ServletServerHttpRequest)request;
             
-            /*
-            //方法一, 登录用户信息直接存在session中
-            HttpSession session = servletRequest.getServletRequest().getSession(false);
-            if (session != null) {
-                //使用userName区分WebSocketHandler，以便定向发送消息
-                String userName = (String) session.getAttribute("SESSION_USERNAME");
-                if (userName==null) {
-                    userName="default-system";
-                }
-                attributes.put("WEBSOCKET_USERNAME",userName);
-            }
-            */
-            
             //方法二, 登录用户信息从远程服务器获取后设置进session, 再缓存到redis
             RpcUser user = SessionUtils.setSessionUser_test(servletRequest.getServletRequest());
             if(user == null){
@@ -75,5 +65,6 @@ public class HandShakeInterceptor extends HttpSessionHandshakeInterceptor {
 
         System.out.println("---- After Handshake ----");
         super.afterHandshake(request, response, wsHandler, ex);
+        
     }
 }

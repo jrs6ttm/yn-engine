@@ -1523,6 +1523,7 @@ public class CourseEngine {
 		  List<ActStudyFile> tempFiles = this.getStudyFile(null, null, null, task.getAssignee(), task.getId(), null, task.getProcessInstanceId());
 		  if(tempFiles.size() > 0){
 			  ActStudyFile tempFile = tempFiles.get(0);
+			  destData.put("fileId", tempFile.getFileid());
 			  destData.put("fileName", tempFile.getFilename());
 			  destData.put("filePath", tempFile.getFilepath());
 			  destData.put("optType", tempFile.getOpttype());

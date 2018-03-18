@@ -28,6 +28,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,25 +53,145 @@ public class FileManagerController {
 	@Autowired
 	private IActStudyFileService actStudyFileService;
 	
-	
-	@RequestMapping(value="/fileUploadByContent")  
-    public @ResponseBody String fileCreate(HttpServletRequest request, HttpServletResponse response){
+	/**
+	 * 
+	 * @Title: studyFileUploadByContent 
+	 * @Description: 以内容形式保存学习过程中的文件， 针对富文本与思维导图。【注】此时文件已经存在，这里是更新
+	 * @author 张龙龙
+	 * @date 2018年3月18日 上午11:19:27
+	 * @param @param request
+	 * @param @return     
+	 * @return String     
+	 * @throws 
+	 */
+	@RequestMapping(value="/studyFileUploadByContent")  
+    public @ResponseBody String studyFileUploadByContent(HttpServletRequest request){
 		Map<String, String> rMap = new HashMap<String, String>();
 		try {
 			String userId = request.getParameter("userId");
 			String fileId = request.getParameter("fileId");
 			String fileName = request.getParameter("fileName");
-			String createType = request.getParameter("createType");
+			//String createType = request.getParameter("createType");
 			String fileStr = request.getParameter("fileStr");
 			
+			if(StringUtils.isBlank(userId) || StringUtils.isBlank(fileId)){
+				rMap.put("errorMsg", "缺少用户id【userId】或者文件id【fileId】，不能保存!");
+				return new Gson().toJson(rMap);
+			}
 			
+			ActStudyFile actStudyFile = actStudyFileService.selectByPrimaryKey(fileId);
+			if(actStudyFile == null){
+				rMap.put("errorMsg", "找不到目标文件，不能保存!");
+				return new Gson().toJson(rMap);
+			}
+
+			//如果不是思维导图， 默认就是富文本内容
+			if(!"jm".equals(actStudyFile.getFiletype().toLowerCase())){
+				fileStr = "<!DOCTYPE html><html><head><meta charset='utf-8' /></head><body>"+fileStr+"</body><html>";
+			}
+			//保存文件内容
+			OutputStream out = new FileOutputStream(new File(FileUtils.getFileRootDir() + File.separator + actStudyFile.getFilepath()));
+			OutputStreamWriter write = new OutputStreamWriter(out, "UTF-8");
+			write.write(fileStr);
+			write.flush();
+			write.close();
 			
+			int size = fileStr.getBytes().length;
+			if(size <= 1024){
+				actStudyFile.setFilesize(size + "B");
+			}else if(size <= 1024*1024){
+				actStudyFile.setFilesize(size / 1024 + "KB");
+			}else if(size <= 1024*1024*1024){
+				actStudyFile.setFilesize(size/(1024*1024) + "M");
+			}else{
+				actStudyFile.setFilesize(size/(1024*1024*1024) + "G");
+			}
+			actStudyFile.setLastupdatetime(actStudyFile.getDateStr(null));
+			if(StringUtils.isNoneBlank(fileName) && (fileName.indexOf(".html") > 0 || fileName.indexOf(".jm") > 0)){
+				actStudyFile.setFilename(fileName);
+			}
+			//更新记录
+			actStudyFileService.updateByPrimaryKeySelective(actStudyFile);
 		}catch(Exception e){
 			e.printStackTrace();
+			rMap.put("errorMsg", "保存文件时出现问题！");
 		}
 		
 		return new Gson().toJson(rMap);
 	}
+	
+	/**
+	 * 
+	 * @Title: studyFileUpload 
+	 * @Description: 以文件流的方式上传学习文件， 针对office文档类的保存。【注】此时文件已经存在，这里是更新
+	 * @author 张龙龙
+	 * @date 2018年3月18日 上午11:42:45
+	 * @param @param request
+	 * @param @return     
+	 * @return String     
+	 * @throws 
+	 */
+	@RequestMapping(value="/studyFileUpload")  
+    public @ResponseBody String studyFileUpload(HttpServletRequest request){
+		Map<String, String> rMap = new HashMap<String, String>();
+		try {
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			rMap.put("errorMsg", "保存文件时出现问题！");
+		}
+		
+		return new Gson().toJson(rMap);
+	}
+	
+	/**
+	 * 
+	 * @Title: ownFileUploadByContent 
+	 * @Description: 以内容形式保存文件， 针对富文本与思维导图。【注】此时文件不存在，这里是insert
+	 * @author 张龙龙
+	 * @date 2018年3月18日 上午11:45:32
+	 * @param @param request
+	 * @param @return     
+	 * @return String     
+	 * @throws 
+	 */
+	@RequestMapping(value="/ownFileUploadByContent")  
+    public @ResponseBody String ownFileUploadByContent(HttpServletRequest request){
+		Map<String, String> rMap = new HashMap<String, String>();
+		try {
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			rMap.put("errorMsg", "保存文件时出现问题！");
+		}
+		
+		return new Gson().toJson(rMap);
+	}
+	
+	/**
+	 * 
+	 * @Title: ownFileUpload 
+	 * @Description: 以文件流的方式上传文件， 针对office文档类的保存。【注】此时文件不存在，这里是insert
+	 * @author 张龙龙
+	 * @date 2018年3月18日 上午11:46:41
+	 * @param @param request
+	 * @param @return     
+	 * @return String     
+	 * @throws 
+	 */
+	@RequestMapping(value="/ownFileUpload")  
+    public @ResponseBody String ownFileUpload(HttpServletRequest request){
+		Map<String, String> rMap = new HashMap<String, String>();
+		try {
+			
+		}catch(Exception e){
+			e.printStackTrace();
+			rMap.put("errorMsg", "保存文件时出现问题！");
+		}
+		
+		return new Gson().toJson(rMap);
+	}
+	
 	
 	/**
 	 * 文件上传

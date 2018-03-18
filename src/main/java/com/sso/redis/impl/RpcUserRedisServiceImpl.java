@@ -38,7 +38,7 @@ public class RpcUserRedisServiceImpl implements IRpcUserRedisService {
      */
 	@Override
 	public void cacheUser(RpcUser rpcUser) {
-		String redisKey = PREFIX_USERCACHE + rpcUser.getID();
+		String redisKey = PREFIX_USERCACHE + rpcUser.getId();
         userCache.set(redisKey,rpcUser);
         //userCache.set(redisKey,rpcUser, 5, TimeUnit.HOURS);
 	}
@@ -73,8 +73,8 @@ public class RpcUserRedisServiceImpl implements IRpcUserRedisService {
     public void syncUserInfo(String userId){
     	//TODO 自己的业务处理
     	RpcUser user = new RpcUser();
-		user.setID(Seq.createSeqNum()+"");
-        user.setNICKNAME("yn" + user.getID() + " _redisUser");
+		user.setId(Seq.createSeqNum()+"");
+        user.setNickName("yn" + user.getId() + " _redisUser");
         
         cacheUser(user);
     }

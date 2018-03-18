@@ -65,7 +65,7 @@ public class AppUserRedisService {
     }
 
     public void cacheUser(String token, RpcUser user) {
-        String redisKey = PREFIX_USERID_TOKEN+user.getID();
+        String redisKey = PREFIX_USERID_TOKEN+user.getId();
         String oldToken = redisCache.get(redisKey);
         if(!StringUtils.isEmpty(oldToken)){
             //删除失效的token

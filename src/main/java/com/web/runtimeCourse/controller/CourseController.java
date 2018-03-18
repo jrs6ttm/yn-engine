@@ -12,16 +12,15 @@ import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
+import com.util.ReturnCode;
 import com.util.SysLog;
 import com.web.runtimeCourse.service.impl.CourseEngine;
-import com.yineng.dev_V_3_0.model.ActStudyVar;
 import com.yineng.dev_V_3_0.model.CourseOrgStructure;
-import com.yineng.dev_V_3_0.service.IActStudyVarService;
 import com.yineng.dev_V_3_0.service.ICourseOrgStructureService;
 
 @Controller
@@ -132,33 +131,6 @@ public class CourseController {
 				res.close();
 		}
     }
-	
-	@RequestMapping(value="/deploy_test")  
-    public @ResponseBody void deploy_test(HttpServletRequest request, HttpServletResponse response){ 
-		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setContentType("application/json;charset=utf-8");
-		
-		JSONObject deployObj = new JSONObject();
-		deployObj.put("ecgeditorHost", request.getParameter("ecgeditorHost"));
-		deployObj.put("bpmnInstanceId", request.getParameter("bpmnInstanceId"));//GET、POST都是这样取参数
-		deployObj.put("courseInstanceId", request.getParameter("courseInstanceId"));
-		deployObj.put("isCooperation", request.getParameter("isCooperation"));//是否是组织课程
-		System.out.println(deployObj.toString());
-        
-        String sendMsg = this.courseEngine.deployCourse(deployObj, true);
-        //System.out.println("[deploy result]:" + sendMsg);
-        PrintWriter res = null;
-        try {
-        	res = response.getWriter();
-        	res.write(sendMsg);
-		} catch (IOException e) {
-			System.out.println("deploy响应失败!");
-			e.printStackTrace();
-		}finally{
-			if(res != null)
-				res.close();
-		}
-    }
 		
 	/**
 	 * 响应外部http请求
@@ -208,41 +180,18 @@ public class CourseController {
 	 *   }
 	 * 
 	 */
-	@RequestMapping(value="/study", method = RequestMethod.POST, headers="Content-Type=application/json;charset=UTF-8", produces = {"application/json;charset=UTF-8"})  
-    public @ResponseBody String study(@RequestBody String studyStr, HttpServletRequest request){
+	@RequestMapping(value="/study", method = RequestMethod.POST)  
+    public @ResponseBody String study(String studyStr, HttpServletRequest request){
         //System.out.println("时间："+CourseEngine.getDateStr(null)+", receive study request.");
         //System.out.println(studyStr);
         SysLog.info(null, null, "study request: "+studyStr);
         
 		JSONObject studyObj = new JSONObject(studyStr);
 		JSONObject sendMsg = this.courseEngine.getStudyTasks(studyObj);
-		//System.out.println("时间："+CourseEngine.getDateStr(null)+", response to study request.");
+		System.out.println(sendMsg.toString());
 		SysLog.info(null, null, "study response: "+sendMsg);
 		
         return sendMsg.toString();
-    }
-	
-	@RequestMapping(value="/study_test")  
-    public @ResponseBody void study_test(HttpServletRequest request, HttpServletResponse response){ 
-		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setContentType("application/json;charset=utf-8");
-		
-		String studyReqData = request.getParameter("studyReqData");
-		JSONObject studyObj = new JSONObject(studyReqData);
-		
-        PrintWriter res = null;
-        try {
-        	JSONObject sendMsg = this.courseEngine.getStudyTasks(studyObj);
-    		System.out.println(sendMsg.toString());
-        	res = response.getWriter();
-        	res.write(sendMsg.toString());
-		} catch (Exception e) {
-			System.out.println("study响应失败!");
-			e.printStackTrace();
-		}finally{
-			if(res != null)
-				res.close();
-		}
     }
 	
 	/**

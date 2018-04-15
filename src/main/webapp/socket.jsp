@@ -11,6 +11,36 @@
 	<script type="text/javascript" src="http://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
 	<script type="text/javascript" src="http://cdn.bootcss.com/sockjs-client/1.0.0/sockjs.js"></script>
     <script type="text/javascript">
+	    $.ajax({
+	        url: '/yn-engine/fileManager/getOwnFiles',
+	        data:{fileId : "00504d45-e696-457a-9fa0-cf3ef613b4b3"},
+	        cache: false,
+	        async:false,
+	        type: 'POST',
+	        success : function(result){
+	            if(result){
+	            	result = JSON.parse(result);
+	            	console.log(result[0]);
+	            }
+	        }
+	    });
+    
+	    $.ajax({
+            url: '/yn-engine/fileManager/fileCreate',
+            data:{userId : "zhangsan", targetName : "zhangsan.doc", createType : 'own'},
+            cache: false,
+            async:false,
+            type: 'POST',
+            success : function(result){
+                if(result){
+                    result = JSON.parse(result);
+                    console.log(result);
+                    filePath = result.filePath;
+                    officeId = result.fileId;
+                }
+            }
+        });
+	    
 	    var websocket = null;
 	    var url = "http://localhost:8022/yn-engine/socket/hello";
 	    

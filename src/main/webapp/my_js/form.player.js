@@ -20,25 +20,25 @@ var createFormHtml_player = function(EngineHost, formInfo){
 		
 		var parseHtml = parseFormAttrs.render();
 		/*
-		parseHtml = '<link href="'+EngineHost+'/ec_engine/css/bootstrap.min.css" rel="stylesheet" type="text/css" />' + 
+		parseHtml = '<link href="'+EngineHost+'/yn-engine/css/bootstrap.min.css" rel="stylesheet" type="text/css" />' + 
 						parseHtml +
-					 '<script src="'+EngineHost+'/ec_engine/js/jquery.min.js" type="text/javascript"></script>'+
-					 '<script src="'+EngineHost+'/ec_engine/js/underscore.js" type="text/javascript"></script>'+
-					 '<script src="'+EngineHost+'/ec_engine/js/backbone.js" type="text/javascript"></script>'+
-					 '<script src="'+EngineHost+'/ec_engine/my_js/parseFormAttrs.js" type="text/javascript"></script>'+
-					 '<script src="'+EngineHost+'/ec_engine/my_js/form.player.js" type="text/javascript"></script>';
+					 '<script src="'+EngineHost+'/yn-engine/js/jquery.min.js" type="text/javascript"></script>'+
+					 '<script src="'+EngineHost+'/yn-engine/js/underscore.js" type="text/javascript"></script>'+
+					 '<script src="'+EngineHost+'/yn-engine/js/backbone.js" type="text/javascript"></script>'+
+					 '<script src="'+EngineHost+'/yn-engine/my_js/parseFormAttrs.js" type="text/javascript"></script>'+
+					 '<script src="'+EngineHost+'/yn-engine/my_js/form.player.js" type="text/javascript"></script>';
 		*/
 		
-		parseHtml = '<link href="'+EngineHost+'/ec_engine/css/bootstrap.min.css" rel="stylesheet" type="text/css" />' + 
+		parseHtml = '<link href="'+EngineHost+'/yn-engine/css/bootstrap.min.css" rel="stylesheet" type="text/css" />' + 
 						parseHtml +
 					'<script  type="text/javascript">'+
-						'$.getScript("'+EngineHost+'/ec_engine/js/underscore.js", function(){'+
+						'$.getScript("'+EngineHost+'/yn-engine/js/underscore.js", function(){'+
 							'console.log("underscore.js is loaded.");'+
-							'$.getScript("'+EngineHost+'/ec_engine/js/backbone.js", function(){'+
+							'$.getScript("'+EngineHost+'/yn-engine/js/backbone.js", function(){'+
 								'console.log("backbone.js is loaded.");'+
-								'$.getScript("'+EngineHost+'/ec_engine/my_js/parseFormAttrs.js", function(){'+
+								'$.getScript("'+EngineHost+'/yn-engine/my_js/parseFormAttrs.js", function(){'+
 									'console.log("parseFormAttrs.js is loaded.");'+
-									'$.getScript("'+EngineHost+'/ec_engine/my_js/form.player.js", function(){'+
+									'$.getScript("'+EngineHost+'/yn-engine/my_js/form.player.js", function(){'+
 										'console.log("form.player.js is loaded.");'+
 									'});'+
 								'});'+
@@ -113,7 +113,7 @@ var parseFormAttr_player = function(EngineHost, formId){
 var submitMyForm = function(EngineHost, formId, callback){
 	var parseResult = parseFormAttr_player(EngineHost, formId);
 	parseResult.cId = formId;
-	$.post(EngineHost+'/ec_engine/form/saveFormRun', parseResult, 
+	$.post(EngineHost+'/yn-engine/form/saveFormRun', parseResult, 
 		   function(cId){
 				//$('#savedform').empty();
 				//$('#savedform').append(parseResult.formHtml);

@@ -617,6 +617,88 @@ public class FileManagerController {
 		}
     }
 	
+	/**
+	 * 
+	 * @Title: fileCreate 
+	 * @Description: 文件创建， 一般用于课程编辑过程中
+	 * @author 张龙龙
+	 * @date 2018年4月15日 下午9:57:59
+	 * @param @param request
+	 * @param @param response     
+	 * @return void     
+	 * @throws 
+	 */
+	@RequestMapping(value="/fileCreate")  
+    public @ResponseBody void fileCreate(HttpServletRequest request, HttpServletResponse response){ 
+		String errorMsg = null, inPath = null, output_filePath = null, output_fileId = UUID.randomUUID().toString();
+		
+		String userId = request.getParameter("userId");
+		String targetName = request.getParameter("targetName");
+		String createType = request.getParameter("createType");//own:自己上传的文件；study:学习过程中产生的文件
+		/*
+		String inPath = request.getParameter("sourceF");//模板文件
+		if(inPath == null || "".equals(inPath)){
+			inPath = request.getParameter("filePath");//actionOutput(任务输出)文件
+		}
+		*/
+		
+		PrintWriter res = null;
+		try {
+			String tLast = targetName.substring(targetName.lastIndexOf(".") + 1);
+			Map<String, String> file_Map = FileUtils.createFileInstance(userId, inPath, targetName, tLast, createType);
+			if(file_Map.containsKey("errorMsg")){
+				errorMsg = file_Map.get("errorMsg");
+			}else{
+				output_filePath = file_Map.get("filePath");
+				int insertR = 0;
+				//存数据库
+				if("own".equals(createType)){
+					ActOwnFile newActOwnFile = new ActOwnFile(output_fileId, output_filePath, targetName, 
+							userId, null, null, tLast);
+					
+					insertR = this.actOwnFileService.insertSelective(newActOwnFile);
+				}else{
+					ActStudyFile newActStudyFile = new ActStudyFile(output_fileId, output_filePath, targetName,
+							userId, null, null,
+							tLast, null, null, null, null, null, null, 1);
+					
+					insertR = this.actStudyFileService.insertSelective(newActStudyFile);
+				}
+				
+				if(insertR <= 0){
+					errorMsg = "抱歉，保存创建的文件信息失败！";
+				}
+			}
+			
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			//response.setHeader("Content-type", "text/html;charset=UTF-8");
+			response.setCharacterEncoding("utf-8");
+			
+			res = response.getWriter();
+			if(errorMsg != null){
+				SysLog.error(userId, "", errorMsg);
+				res.write(errorMsg);
+			}else{
+				JSONObject uploadResult = new JSONObject();
+				uploadResult.put("filePath", output_filePath);
+				uploadResult.put("fileId", output_fileId);
+				
+				output_filePath = null;
+				errorMsg = null;
+				
+				SysLog.info(userId, "", "fileCreate成功，filePath:"+output_filePath);
+				res.write(uploadResult.toString());
+			}
+		} catch (IOException e) {
+			SysLog.error(userId, "", "fileCreate error!");
+			System.out.println("fileCreate error!");
+			e.printStackTrace();
+		}finally{
+			if(res != null){
+				res.close();
+			}
+		}
+    }
 	
 	/**
 	 * 文件复制,现在只出现在学习过程中
@@ -629,6 +711,7 @@ public class FileManagerController {
 		
 		String userId = request.getParameter("userId");
 		String targetName = request.getParameter("targetName");
+		String createType = request.getParameter("createType");//own:自己上传的文件；study:学习过程中产生的文件
 		/*
 		String inPath = request.getParameter("sourceF");//模板文件
 		if(inPath == null || "".equals(inPath)){
@@ -638,24 +721,24 @@ public class FileManagerController {
 		
 		PrintWriter res = null;
 		try {
-			String inLast = "", tLast = "";
+			String inLast = "", tLast = targetName.substring(targetName.lastIndexOf(".") + 1);
 			inPath = request.getParameter("filePath");//统一用filePath
-			if(inPath == null || "".equals(inPath)){
+			if(StringUtils.isEmpty(inPath)){
 				String fileid = request.getParameter("fileId");
-				String createType = request.getParameter("createType");//own:自己上传的文件；study:学习过程中产生的文件
-				
-				SysLog.info(userId, "{\"userId\":"+userId+", \"targetName\":"+targetName+", \"fileid\":"+fileid+", \"createType\":"+createType+"}", "");
-				if("own".equals(createType.toLowerCase())){
-					ActOwnFile actOwnFile = this.actOwnFileService.selectByPrimaryKey(fileid);
-					if(actOwnFile != null){
-						inPath = actOwnFile.getFilepath();
-						inLast = actOwnFile.getFiletype();
-					}
-				}else{
-					ActStudyFile actStudyFile = this.actStudyFileService.selectByPrimaryKey(fileid);
-					if(actStudyFile != null){
-						inPath = actStudyFile.getFilepath();
-						inLast = actStudyFile.getFiletype();
+				if(!StringUtils.isEmpty(fileid)){
+					SysLog.info(userId, "{\"userId\":"+userId+", \"targetName\":"+targetName+", \"fileid\":"+fileid+", \"createType\":"+createType+"}", "");
+					if("own".equals(createType.toLowerCase())){
+						ActOwnFile actOwnFile = this.actOwnFileService.selectByPrimaryKey(fileid);
+						if(actOwnFile != null){
+							inPath = actOwnFile.getFilepath();
+							inLast = actOwnFile.getFiletype();
+						}
+					}else{
+						ActStudyFile actStudyFile = this.actStudyFileService.selectByPrimaryKey(fileid);
+						if(actStudyFile != null){
+							inPath = actStudyFile.getFilepath();
+							inLast = actStudyFile.getFiletype();
+						}
 					}
 				}
 			}else{
@@ -677,7 +760,7 @@ public class FileManagerController {
 			}
 			
 			if(errorMsg != null){
-				Map<String, String> file_Map = FileUtils.createFileInstance(userId, inPath, targetName, inLast);
+				Map<String, String> file_Map = FileUtils.createFileInstance(userId, inPath, targetName, inLast, createType);
 				if(file_Map.containsKey("errorMsg")){
 					errorMsg = file_Map.get("errorMsg");
 				}else{

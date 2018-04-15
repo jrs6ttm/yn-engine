@@ -289,11 +289,11 @@ public class FileUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Map<String, String> createFile(String fileRootDir, String userId, String targetName, String last) throws IOException{
+	public static Map<String, String> createFile(String fileRootDir, String userId, String targetName, String last, String createType) throws IOException{
 		Map<String, String> rMap = new HashMap<String, String>();
 		
 		int create_lastIndex = targetName.lastIndexOf(".");
-		String output_filePath = FileUtils.getFileRelativePath(fileRootDir, targetName.substring(create_lastIndex+1), userId, targetName, "study");
+		String output_filePath = FileUtils.getFileRelativePath(fileRootDir, targetName.substring(create_lastIndex+1), userId, targetName, createType);
 		if(output_filePath == null){
 			rMap.put("errorMsg", "文件创建失败，系统禁止对格式为【"+targetName.substring(create_lastIndex+1)+"】的文件进行操作！");
 		}else{
@@ -304,7 +304,7 @@ public class FileUtils {
 				//InputStream in = servletContext.getResourceAsStream(tPath);
 				InputStream in = new FileInputStream(new File(tPath));
 				
-				rMap = FileUtils.copyFile(in, userId, targetName, last);
+				rMap = FileUtils.copyFile(in, userId, targetName, last, createType);
 			}else{
 				File create_file = new File(fileRootDir + File.separator + output_filePath);
 				if(!create_file.createNewFile()){
@@ -328,7 +328,7 @@ public class FileUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Map<String, String> copyFile(String fileRootDir, String inPath, String userId, String targetName, String last) throws IOException{
+	public static Map<String, String> copyFile(String fileRootDir, String inPath, String userId, String targetName, String last, String createType) throws IOException{
 		Map<String, String> rMap = new HashMap<String, String>();
 		
 		InputStream in = FileUtils.readFile(fileRootDir + File.separator + inPath);
@@ -336,7 +336,7 @@ public class FileUtils {
 			String errorMsg = "找不到要拷贝的源文件【"+inPath+"】";
 			rMap.put("errorMsg", errorMsg);
 		}else{
-			rMap = FileUtils.copyFile(in, userId, targetName, last);
+			rMap = FileUtils.copyFile(in, userId, targetName, last, createType);
 			/*
 			int lastIndex = inPath.lastIndexOf(".");
 			String output_filePath = FileUtils.getFileRelativePath(fileRootDir, inPath.substring(lastIndex+1), userId, targetName, "study");
@@ -353,14 +353,14 @@ public class FileUtils {
 		return rMap;
 	}
 	
-	public static Map<String, String> copyFile(InputStream in, String userId, String targetName, String last) throws IOException{
+	public static Map<String, String> copyFile(InputStream in, String userId, String targetName, String last, String createType) throws IOException{
 		Map<String, String> rMap = new HashMap<String, String>();
 		
 		if(in == null){
 			String errorMsg = "复制的文件流为null！";
 			rMap.put("errorMsg", errorMsg);
 		}else{
-			String output_filePath = FileUtils.getFileRelativePath(fileRootDir, last, userId, targetName, "study");
+			String output_filePath = FileUtils.getFileRelativePath(fileRootDir, last, userId, targetName, createType);
 			if(output_filePath == null){
 				rMap.put("errorMsg", "文件复制失败，系统禁止对格式为【"+last+"】的文件进行操作！");
 			}else{
@@ -381,15 +381,15 @@ public class FileUtils {
 	 * @param targetName
 	 * @return
 	 */
-	public static Map<String, String> createFileInstance(String userId, String filePath, String targetName, String last){
+	public static Map<String, String> createFileInstance(String userId, String filePath, String targetName, String last, String createType){
 		Map<String, String> file_Map = new HashMap<String, String>(); 
 		
 		try {
 			String fileRootDir = FileUtils.getFileRootDir();
 			if(filePath == null || "".equals(filePath)){//create new file
-				file_Map = FileUtils.createFile(fileRootDir, userId, targetName, last);
+				file_Map = FileUtils.createFile(fileRootDir, userId, targetName, last, createType);
 			}else{//copy 
-				file_Map = FileUtils.copyFile(fileRootDir, filePath, userId, targetName, last);
+				file_Map = FileUtils.copyFile(fileRootDir, filePath, userId, targetName, last, createType);
 			}
 		} catch (IOException e) {
 			file_Map.put("errorMsg", "生成文件实例时出现异常！");

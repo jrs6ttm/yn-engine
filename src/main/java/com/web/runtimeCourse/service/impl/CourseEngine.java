@@ -1435,7 +1435,7 @@ public class CourseEngine {
 		  fileName = targetName;
 	  }
 	  
-	  Map<String, String> file_Map = FileUtils.createFileInstance(userId, filePath, targetName, last);
+	  Map<String, String> file_Map = FileUtils.createFileInstance(userId, filePath, targetName, last, "study");
 	  if(file_Map.containsKey("errorMsg")){
 		   fileId = "时间："+CourseEngine.getDateStr(null)+
 				    " <br />错误：生成当前任务【id:"+task.getId()+", name:"+task.getName()+"】的预设文件【"+fileName+"】失败!<br />原因："+

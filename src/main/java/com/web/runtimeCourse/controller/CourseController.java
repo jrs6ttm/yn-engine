@@ -181,7 +181,9 @@ public class CourseController {
 	 * 
 	 */
 	@RequestMapping(value="/study", method = RequestMethod.POST)  
-    public @ResponseBody String study(String studyStr, HttpServletRequest request){
+    public @ResponseBody String study(String studyStr, HttpServletRequest request, HttpServletResponse response){
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setContentType("application/json;charset=utf-8");
         //System.out.println("时间："+CourseEngine.getDateStr(null)+", receive study request.");
         //System.out.println(studyStr);
         SysLog.info(null, null, "study request: "+studyStr);

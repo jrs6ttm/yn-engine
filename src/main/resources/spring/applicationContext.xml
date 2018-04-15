@@ -39,20 +39,21 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     </bean>
 
     <!-- 数据源配置 -->
+    <!-- 
     <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
-        <!-- 连接信息 -->
+        
         <property name="driverClassName" value="${jdbc.driver}" />
         <property name="url" value="${jdbc.url}" />
         <property name="username" value="${jdbc.username}" />
         <property name="password" value="${jdbc.password}" />
 
-        <!-- 连接池信息 -->
+        
         <property name="maxActive" value="${jdbc.pool.maxActive}" />
         <property name="maxIdle" value="${jdbc.pool.maxIdle}" />
         <property name="initialSize" value="${jdbc.pool.initialSize}" />
         <property name="defaultAutoCommit" value="false" />
 
-        <!-- 连接检查 -->
+        
         <property name="testWhileIdle" value="${jdbc.pool.testWhileIdle}" />
         <property name="testOnBorrow" value="${jdbc.pool.testOnBorrow}" />
         <property name="testOnReturn" value="${jdbc.pool.testOnReturn}" />
@@ -62,7 +63,17 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         <property name="minEvictableIdleTimeMillis" value="${jdbc.pool.minEvictableIdleTimeMillis}" />
         <property name="jdbcInterceptors" value="${jdbc.pool.jdbcInterceptors}" />
     </bean>
-
+	-->
+	
+	<!-- 数据源配置,使用应用内的DBCP数据库连接池 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="${jdbc.driver}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean>
+	
     <!-- 事务管理  -->  
 	<bean name="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
 	    <property name="dataSource" ref="dataSource" />  

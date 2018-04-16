@@ -65,9 +65,16 @@ public class FileManagerController {
 	 * @throws 
 	 */
 	@RequestMapping(value="/studyFileUploadByContent")  
-    public @ResponseBody String studyFileUploadByContent(HttpServletRequest request){
+    public @ResponseBody String studyFileUploadByContent(HttpServletRequest request, HttpServletResponse response){
 		Map<String, String> rMap = new HashMap<String, String>();
+		
+		PrintWriter res = null;
 		try {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			//response.setHeader("Content-type", "text/html;charset=UTF-8");
+			response.setCharacterEncoding("utf-8");
+			res = response.getWriter();
+			
 			String userId = request.getParameter("userId");
 			String fileId = request.getParameter("fileId");
 			String fileName = request.getParameter("fileName");
@@ -115,6 +122,10 @@ public class FileManagerController {
 		}catch(Exception e){
 			e.printStackTrace();
 			rMap.put("errorMsg", "保存文件时出现问题！");
+		}finally{
+			if(res != null){
+				res.close();
+			}
 		}
 		
 		return new Gson().toJson(rMap);

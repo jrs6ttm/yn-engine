@@ -65,8 +65,8 @@ public class FileManagerController {
 	 * @throws 
 	 */
 	@RequestMapping(value="/studyFileUploadByContent")  
-    public @ResponseBody String studyFileUploadByContent(HttpServletRequest request, HttpServletResponse response){
-		Map<String, String> rMap = new HashMap<String, String>();
+    public @ResponseBody void studyFileUploadByContent(HttpServletRequest request, HttpServletResponse response){
+		JSONObject result = new JSONObject();
 		
 		PrintWriter res = null;
 		try {
@@ -82,53 +82,54 @@ public class FileManagerController {
 			String fileStr = request.getParameter("fileStr");
 			
 			if(StringUtils.isBlank(userId) || StringUtils.isBlank(fileId)){
-				rMap.put("errorMsg", "缺少用户id【userId】或者文件id【fileId】，不能保存!");
-				return new Gson().toJson(rMap);
-			}
-			
-			ActStudyFile actStudyFile = actStudyFileService.selectByPrimaryKey(fileId);
-			if(actStudyFile == null){
-				rMap.put("errorMsg", "找不到目标文件，不能保存!");
-				return new Gson().toJson(rMap);
-			}
-
-			//如果不是思维导图， 默认就是富文本内容
-			if(!"jm".equals(actStudyFile.getFiletype().toLowerCase())){
-				fileStr = "<!DOCTYPE html><html><head><meta charset='utf-8' /></head><body>"+fileStr+"</body><html>";
-			}
-			//保存文件内容
-			OutputStream out = new FileOutputStream(new File(FileUtils.getFileRootDir() + File.separator + actStudyFile.getFilepath()));
-			OutputStreamWriter write = new OutputStreamWriter(out, "UTF-8");
-			write.write(fileStr);
-			write.flush();
-			write.close();
-			
-			int size = fileStr.getBytes().length;
-			if(size <= 1024){
-				actStudyFile.setFilesize(size + "B");
-			}else if(size <= 1024*1024){
-				actStudyFile.setFilesize(size / 1024 + "KB");
-			}else if(size <= 1024*1024*1024){
-				actStudyFile.setFilesize(size/(1024*1024) + "M");
+				result.put("errorMsg", "缺少用户id【userId】或者文件id【fileId】，不能保存!");
+				res.write(result.toString());
 			}else{
-				actStudyFile.setFilesize(size/(1024*1024*1024) + "G");
+				ActStudyFile actStudyFile = actStudyFileService.selectByPrimaryKey(fileId);
+				if(actStudyFile == null){
+					result.put("errorMsg", "找不到目标文件，不能保存!");
+					res.write(result.toString());
+				}else{
+					//如果不是思维导图， 默认就是富文本内容
+					if(!"jm".equals(actStudyFile.getFiletype().toLowerCase())){
+						fileStr = "<!DOCTYPE html><html><head><meta charset='utf-8' /></head><body>"+fileStr+"</body><html>";
+					}
+					//保存文件内容
+					OutputStream out = new FileOutputStream(new File(FileUtils.getFileRootDir() + File.separator + actStudyFile.getFilepath()));
+					OutputStreamWriter write = new OutputStreamWriter(out, "UTF-8");
+					write.write(fileStr);
+					write.flush();
+					write.close();
+					
+					int size = fileStr.getBytes().length;
+					if(size <= 1024){
+						actStudyFile.setFilesize(size + "B");
+					}else if(size <= 1024*1024){
+						actStudyFile.setFilesize(size / 1024 + "KB");
+					}else if(size <= 1024*1024*1024){
+						actStudyFile.setFilesize(size/(1024*1024) + "M");
+					}else{
+						actStudyFile.setFilesize(size/(1024*1024*1024) + "G");
+					}
+					actStudyFile.setLastupdatetime(actStudyFile.getDateStr(null));
+					if(StringUtils.isNoneBlank(fileName) && (fileName.indexOf(".html") > 0 || fileName.indexOf(".jm") > 0)){
+						actStudyFile.setFilename(fileName);
+					}
+					//更新记录
+					actStudyFileService.updateByPrimaryKeySelective(actStudyFile);
+					
+					res.write(result.toString());
+				}
 			}
-			actStudyFile.setLastupdatetime(actStudyFile.getDateStr(null));
-			if(StringUtils.isNoneBlank(fileName) && (fileName.indexOf(".html") > 0 || fileName.indexOf(".jm") > 0)){
-				actStudyFile.setFilename(fileName);
-			}
-			//更新记录
-			actStudyFileService.updateByPrimaryKeySelective(actStudyFile);
 		}catch(Exception e){
 			e.printStackTrace();
-			rMap.put("errorMsg", "保存文件时出现问题！");
+			result.put("errorMsg", "保存文件时出现问题！");
+			res.write(result.toString());
 		}finally{
 			if(res != null){
 				res.close();
 			}
 		}
-		
-		return new Gson().toJson(rMap);
 	}
 	
 	/**

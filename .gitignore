@@ -1,8 +1,6 @@
-target/*
-target/m2e-wtp/*
-.git/*
-.settings/*
-.classpath
-.gitattributes
+target
+.git
 .project
-*.properties
+.classpath
+.settings
+.idea

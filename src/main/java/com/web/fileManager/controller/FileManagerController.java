@@ -32,11 +32,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.util.FileUtils;
 import com.util.ImageUtils;
+import com.util.ReturnCode;
 import com.util.SysLog;
 import com.web.fileManager.entity.ActOwnFile;
 import com.web.fileManager.entity.ActStudyFile;
@@ -192,16 +195,151 @@ public class FileManagerController {
 	 * @throws 
 	 */
 	@RequestMapping(value="/ownFileUpload")  
-    public @ResponseBody String ownFileUpload(HttpServletRequest request){
+    public @ResponseBody void ownFileUpload(@RequestParam("file") MultipartFile sourceFile, HttpServletRequest request, HttpServletResponse response){
 		Map<String, String> rMap = new HashMap<String, String>();
+		List<String> imageZooms = new ArrayList<String>(3);
+		UUID uuid = UUID.randomUUID();
+		String errorMsg = null, fileSize = "0", relativePath = null;
+
+		response.setHeader("Access-Control-Allow-Origin", "*");
+		response.setHeader("Content-type", "text/html;charset=UTF-8");
+		response.setCharacterEncoding("utf-8");
+		PrintWriter res = null;
+		
 		try {
+			res = response.getWriter();
 			
+			String fileRootDir = FileUtils.getFileRootDir();
+			File file_cache = new File(fileRootDir);
+			if (!file_cache.exists()) {  
+				file_cache.mkdirs();  
+	        }
+			
+			long size = sourceFile.getSize();
+			String fileName = sourceFile.getOriginalFilename();
+			String fileId = request.getParameter("fileId");
+			String userId = request.getParameter("userId");
+			String imageSizes = request.getParameter("imageSizes");
+			//System.out.println(size + " " +fileName + " " + userId + " " + createType);
+			int lastIndex = fileName.lastIndexOf(".");
+			String last = fileName.substring(lastIndex+1).toLowerCase();//文件后缀
+			 
+			//检查userId
+			if(StringUtils.isBlank(userId)){
+				errorMsg = "上传请求里缺少用户id属性，不能上传!";
+			}
+			
+			if(errorMsg == null){
+				if(size <= 1024)
+					fileSize = size + "B";
+				else if(size <= 1024*1024)
+					fileSize = size / 1024 + "KB";
+				else if(size <= 1024*1024*1024)
+					fileSize = size/(1024*1024) + "M";
+				else
+					fileSize = size/(1024*1024*1024) + "G";
+				
+				if(StringUtils.isBlank(fileId)){//create new
+					relativePath = FileUtils.getFileRelativePath(fileRootDir, last, userId, uuid + "." + last, "own");
+					if(relativePath == null){
+						errorMsg = "抱歉，系统不允许格式为【"+last+"】的文件上传，请选择上传其他常规的文件类型";
+					}else if(relativePath.contains("videos") && !"3pg".equals(last.toLowerCase()) && !"mp4".equals(last.toLowerCase())){ //临时处理
+						errorMsg = "抱歉，暂时不允许上传"+last+"格式的视频文件，请将视频文件转换为3pg或mp4格式后再上传！";
+					}
+				}else{
+					ActOwnFile actOwnFile = this.actOwnFileService.selectByPrimaryKey(fileId);
+					if(actOwnFile != null){
+						relativePath = actOwnFile.getFilepath();
+						last = actOwnFile.getFiletype();//文件后缀
+					}else{
+						errorMsg = "找不到要更新的文件！";
+					}
+				}
+				
+				if(errorMsg == null){
+					File targetFile = new File(fileRootDir + File.separator + relativePath);
+					sourceFile.transferTo(targetFile);
+					
+					if(StringUtils.isNoneBlank(imageSizes)){//图片裁剪
+						String fileTypeDir = FileUtils.getFileTypeDir(last);
+						if(fileTypeDir != null && "images".equals(fileTypeDir)){
+							String[] imageSizeArr = imageSizes.split("_");
+							for(int iSize = 0; iSize < imageSizeArr.length;iSize ++){
+								String[] currSizeArr = imageSizeArr[iSize].split("m");
+								if(currSizeArr.length != 2){
+									errorMsg = "sizeError：裁剪图片的格式错误！";
+									break;
+								}else{
+									int x = Integer.parseInt(currSizeArr[0]);
+									int y = Integer.parseInt(currSizeArr[0]);
+									
+									int cutLastIndex = relativePath.indexOf(fileTypeDir);
+									StringBuffer sCutImagePath = new StringBuffer();
+									sCutImagePath.append(relativePath.substring(0, cutLastIndex-1)).append(File.separator).append("cutImages");
+									FileUtils.makeFileDir(fileRootDir, sCutImagePath.toString());
+									
+									sCutImagePath.append(File.separator).append("zoom_").append(x).append("m").append(y).append(".").append(last);
+									ImageUtils.zoomImage(fileRootDir + File.separator + relativePath, fileRootDir + File.separator + sCutImagePath.toString(), x, y);
+									imageZooms.add(sCutImagePath.toString());
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if(errorMsg != null){
+				JSONObject errResult = new JSONObject();
+				errResult.put("errorMsg", errorMsg);
+				res.write(errResult.toString());
+				//return errResult.toString();
+			}else{
+				if(StringUtils.isBlank(fileId)){//create new
+					ActOwnFile actOwnFile = new ActOwnFile(null, relativePath, sourceFile.getOriginalFilename(), userId, fileSize, null, last);
+					actOwnFile.setFileid(uuid.toString());
+					if(imageZooms.size() > 0){
+						actOwnFile.setImagezooms(imageZooms.toString());
+					}
+					
+					if(actOwnFileService.insertSelective(actOwnFile) > 0){
+						SysLog.info(userId, "", new Gson().toJson(actOwnFile));
+						res.write(new Gson().toJson(actOwnFile));
+					}else{
+						JSONObject errResult = new JSONObject();
+						errResult.put("errorMsg", "抱歉，你上传的文件的记录保存失败，请尝试重新上传！");
+						SysLog.error(userId, "", errResult.getString("errorMsg"));
+						
+						res.write(errResult.toString());
+					}
+				}else{//update
+					ActOwnFile actOwnFile = new ActOwnFile();
+					actOwnFile.setFileid(fileId);
+					actOwnFile.setFilesize(fileSize);
+					actOwnFile.setFilename(actOwnFile.getCreatetime());
+					actOwnFile.setLastupdatetime(actOwnFile.getDateStr(null));
+					
+					if(actOwnFileService.updateByPrimaryKeySelective(actOwnFile) > 0){
+						SysLog.info(userId, "", new Gson().toJson(actOwnFile));
+						res.write(new Gson().toJson(actOwnFile));
+					}else{
+						JSONObject errResult = new JSONObject();
+						errResult.put("errorMsg", "抱歉，你保存的文件的记录保存失败，请尝试重新保存！");
+						SysLog.error(userId, "", errResult.getString("errorMsg"));
+						
+						res.write(errResult.toString());
+					}
+
+				}
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 			rMap.put("errorMsg", "保存文件时出现问题！");
+			res.write(rMap.toString());
+		}finally{
+			if(res != null){
+				res.close();
+			}
 		}
-		
-		return new Gson().toJson(rMap);
 	}
 	
 	

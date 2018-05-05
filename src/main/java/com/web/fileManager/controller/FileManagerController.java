@@ -303,7 +303,14 @@ public class FileManagerController {
 					
 					if(actOwnFileService.insertSelective(actOwnFile) > 0){
 						SysLog.info(userId, "", new Gson().toJson(actOwnFile));
-						res.write(new Gson().toJson(actOwnFile));
+						JSONObject result = new JSONObject();
+						result.put("fileId", actOwnFile.getFileid());
+						result.put("filePath", actOwnFile.getFilepath());
+						result.put("fileSize", actOwnFile.getFilesize());
+						result.put("fileType", actOwnFile.getFiletype());
+						result.put("fileName", actOwnFile.getFilename());
+						
+						res.write(result.toString());
 					}else{
 						JSONObject errResult = new JSONObject();
 						errResult.put("errorMsg", "抱歉，你上传的文件的记录保存失败，请尝试重新上传！");
@@ -320,7 +327,14 @@ public class FileManagerController {
 					
 					if(actOwnFileService.updateByPrimaryKeySelective(actOwnFile) > 0){
 						SysLog.info(userId, "", new Gson().toJson(actOwnFile));
-						res.write(new Gson().toJson(actOwnFile));
+						JSONObject result = new JSONObject();
+						result.put("fileId", actOwnFile.getFileid());
+						result.put("filePath", actOwnFile.getFilepath());
+						result.put("fileSize", actOwnFile.getFilesize());
+						result.put("fileType", actOwnFile.getFiletype());
+						result.put("fileName", actOwnFile.getFilename());
+						
+						res.write(result.toString());
 					}else{
 						JSONObject errResult = new JSONObject();
 						errResult.put("errorMsg", "抱歉，你保存的文件的记录保存失败，请尝试重新保存！");

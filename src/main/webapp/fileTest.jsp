@@ -25,12 +25,12 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
      <!-- enctype 默认是 application/x-www-form-urlencoded -->
      <div>
      	<p>上传文件测试：</p>
-	     <form action="fileManager/fileUpload" enctype="multipart/form-data" method="post" >
+	     <form action="fileManager/ownFileUpload" enctype="multipart/form-data" method="post" >
               <p>参数：</p>
               <!-- <input type="text" name="imageSizes" value="125m125_75m75"><br/> -->
               <span>用户ID: </span><input type="text" name="userId"><br/><br/>
               <span>createType: </span><input type="text" name="createType"><br/><br/>
-              <span>文      件: </span><input type="file" name="file1"><br/><br/>
+              <span>文      件: </span><input type="file" name="file"><br/><br/>
               <input type="submit" value="上 传"/>
 	     </form>
      </div>

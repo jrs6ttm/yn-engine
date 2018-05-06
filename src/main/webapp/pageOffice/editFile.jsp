@@ -9,6 +9,7 @@
 <!-- 下面是页面是的JAVA处理逻辑 -->
 <%
 	String userName = "易能教育";
+    String fileName = "";
 	//得到网站的根址URL
 	String strBasePath = request.getScheme() + "://"
 			+ request.getServerName() + ":" + request.getServerPort()
@@ -16,62 +17,74 @@
 	
 	String filePath = request.getParameter("filePath");
 	System.out.println("filePath : " + filePath);
+	if(filePath == null || "".equals(filePath.trim())){
+		String path = request.getParameter("path");
+		System.out.println("path : " + path);
+		
+		String fileId = path.split("&")[0].split("?")[1].split("=")[1];
+		
+	}
+	/*
+	String fileName = request.getParameter("fileName");
+	if(fileName != null && !"".equals(fileName)){
+		fileName = new String(fileName.trim().getBytes("ISO-8859-1"), "utf-8");
+	}
+	System.out.println("fileName : " + fileName);
+	*/
 	if(filePath != null && !"".equals(filePath.trim())){
 		String permission = request.getParameter("permission");
 		if(permission == null || "".equals(permission.trim())){
 			permission = "rw";
 		}
 		
-		String fileName = "";
-		if(filePath != null && !"".equals(filePath)){
-			//******************************卓正PageOffice组件的使用*******************************
-			
-			//创建控件的对象
-			PageOfficeCtrl poCtrl1 = new PageOfficeCtrl(request);
-			
-		    ////此行必须
-			poCtrl1.setServerPage(request.getContextPath() + "/poserver.zz");
+		//******************************卓正PageOffice组件的使用*******************************
+		
+		//创建控件的对象
+		PageOfficeCtrl poCtrl1 = new PageOfficeCtrl(request);
+		
+	    ////此行必须
+		poCtrl1.setServerPage(request.getContextPath() + "/poserver.zz");
 
-			poCtrl1.setCustomToolbar(false);//隐藏自定义工具栏
-			
-			//指定保存文件后台处理JSP页面，如要保存文件，此行必须
-			poCtrl1.setSaveFilePage("./saveFile.jsp?filePath=" + filePath);
+		poCtrl1.setCustomToolbar(false);//隐藏自定义工具栏
+		
+		//指定保存文件后台处理JSP页面，如要保存文件，此行必须
+		poCtrl1.setSaveFilePage("./saveFile.jsp?filePath=" + filePath);
 
-			poCtrl1.setCaption(fileName);
-		    
-			String abPath = FileUtils.getFileRootDir() + File.separator + filePath;
-			if (permission.equals("rw")) {
-		        //打开文件
-				if (filePath.endsWith(".docx") || filePath.endsWith(".doc"))
-				{
-					poCtrl1.webOpen("file://" + abPath, OpenModeType.docNormalEdit, userName);
-				}
-				else if (filePath.endsWith(".xlsx") || filePath.endsWith(".xls"))
-				{
-					poCtrl1.webOpen("file://" + abPath, OpenModeType.xlsNormalEdit, userName);
-				}
-				else if (filePath.endsWith(".pptx") || filePath.endsWith(".ppt"))
-				{
-					poCtrl1.webOpen("file://" + abPath, OpenModeType.pptNormalEdit, userName);
-				}
-			} else if (permission.equals("r")) {
-				//打开文件
-				if (filePath.endsWith(".docx") || filePath.endsWith(".doc"))
-				{
-					poCtrl1.webOpen("file://" + abPath, OpenModeType.docReadOnly, userName);
-				}
-				else if (filePath.endsWith(".xlsx") || filePath.endsWith(".xls"))
-				{
-					poCtrl1.webOpen("file://" + abPath, OpenModeType.xlsReadOnly, userName);
-				}
-				else if (filePath.endsWith(".pptx") || filePath.endsWith(".ppt"))
-				{
-					poCtrl1.webOpen("file://" + abPath, OpenModeType.pptReadOnly, userName);
-				}
-			}	
-			
-			poCtrl1.setTagId("PageOfficeCtrl1"); //此行必须
-		}
+		poCtrl1.setCaption(fileName);
+	    
+		String abPath = FileUtils.getFileRootDir() + File.separator + filePath;
+		if (permission.equals("rw")) {
+	        //打开文件
+			if (filePath.endsWith(".docx") || filePath.endsWith(".doc"))
+			{
+				poCtrl1.webOpen("file://" + abPath, OpenModeType.docNormalEdit, userName);
+			}
+			else if (filePath.endsWith(".xlsx") || filePath.endsWith(".xls"))
+			{
+				poCtrl1.webOpen("file://" + abPath, OpenModeType.xlsNormalEdit, userName);
+			}
+			else if (filePath.endsWith(".pptx") || filePath.endsWith(".ppt"))
+			{
+				poCtrl1.webOpen("file://" + abPath, OpenModeType.pptNormalEdit, userName);
+			}
+		} else if (permission.equals("r")) {
+			//打开文件
+			if (filePath.endsWith(".docx") || filePath.endsWith(".doc"))
+			{
+				poCtrl1.webOpen("file://" + abPath, OpenModeType.docReadOnly, userName);
+			}
+			else if (filePath.endsWith(".xlsx") || filePath.endsWith(".xls"))
+			{
+				poCtrl1.webOpen("file://" + abPath, OpenModeType.xlsReadOnly, userName);
+			}
+			else if (filePath.endsWith(".pptx") || filePath.endsWith(".ppt"))
+			{
+				poCtrl1.webOpen("file://" + abPath, OpenModeType.pptReadOnly, userName);
+			}
+		}	
+		
+		poCtrl1.setTagId("PageOfficeCtrl1"); //此行必须
+		
 	}
 %>
 

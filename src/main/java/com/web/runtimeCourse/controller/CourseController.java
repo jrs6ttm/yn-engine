@@ -194,7 +194,7 @@ public class CourseController {
 		System.out.println(sendMsg.toString());
 		
 		//兼容旧课程的旧资料链接问题
-		String studyInfo = sendMsg.toString().replaceAll("ec_engine", "yn-engine").replaceAll("\\/NKTOForMyDemo\\/MyNTKODemo\\/MyFirstWordEditor\\.jsp\\?path", "/yn-engine/pageOffice/editFile.jsp?filePath");
+		String studyInfo = sendMsg.toString().replaceAll("ec_engine", "yn-engine").replaceAll("\\/NKTOForMyDemo\\/MyNTKODemo\\/MyFirstWordEditor\\.jsp", "/yn-engine/pageOffice/redirect.jsp");
 		
 		SysLog.info(null, null, "study response: "+studyInfo);
 		

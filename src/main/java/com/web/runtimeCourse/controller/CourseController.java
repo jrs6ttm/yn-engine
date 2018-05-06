@@ -11,13 +11,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.activiti.engine.impl.util.json.JSONArray;
 import org.activiti.engine.impl.util.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.google.gson.Gson;
-import com.util.ReturnCode;
 import com.util.SysLog;
 import com.web.runtimeCourse.service.impl.CourseEngine;
 import com.yineng.dev_V_3_0.model.CourseOrgStructure;
@@ -32,6 +31,9 @@ public class CourseController {
 	
 	@Resource
 	public ICourseOrgStructureService courseOrgStructureService;
+	
+	@Value("${engine.host}") 
+	public String ENGINE_HOST; 
 	
 	/**
 	 * 获取用户在一个已组织的课程里的组信息
@@ -178,7 +180,7 @@ public class CourseController {
 	 *   
 	 *   	errorMsg : "" //出错的时候会有
 	 *   }
-	 * 
+	 *
 	 */
 	@RequestMapping(value="/study", method = RequestMethod.POST)  
     public @ResponseBody String study(String studyStr, HttpServletRequest request, HttpServletResponse response){
@@ -187,13 +189,16 @@ public class CourseController {
         //System.out.println("时间："+CourseEngine.getDateStr(null)+", receive study request.");
         //System.out.println(studyStr);
         SysLog.info(null, null, "study request: "+studyStr);
-        
 		JSONObject studyObj = new JSONObject(studyStr);
 		JSONObject sendMsg = this.courseEngine.getStudyTasks(studyObj);
 		System.out.println(sendMsg.toString());
-		SysLog.info(null, null, "study response: "+sendMsg);
 		
-        return sendMsg.toString();
+		//兼容旧课程的旧资料链接问题
+		String studyInfo = sendMsg.toString().replaceAll("ec_engine", "yn-engine").replaceAll("/NKTOForMyDemo/MyNTKODemo/MyFirstWordEditor.jsp?path", "/yn-engine/pageOffice/editFile.jsp?filePath");
+		
+		SysLog.info(null, null, "study response: "+studyInfo);
+		
+        return studyInfo;
     }
 	
 	/**

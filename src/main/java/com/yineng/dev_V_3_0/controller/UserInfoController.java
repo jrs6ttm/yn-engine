@@ -95,15 +95,11 @@ public class UserInfoController {//extends BaseSpringController
     }
 	
 	//本系统与外系统http请求的交互测试
-	@RequestMapping(value="/testJava2", method = RequestMethod.POST, headers="Content-Type=application/json")  
-    public void testJava2(HttpServletRequest request, HttpServletResponse response, @RequestBody String myParams){  
+	@RequestMapping(value="/testJava2")  
+    public void testJava2(HttpServletRequest request, HttpServletResponse response){  
 		response.setContentType("application/json;charset=utf-8");
-		
-        //String bpmnInstanceId = request.getParameter("bpmnInstanceId"); //GET方式获取参数
-        //HttpSession session = request.getSession(); 
-        //System.out.println(bpmnInstanceId); 
-        System.out.println(myParams);
-        
+		System.out.println(request.getServerName());
+		System.out.println("http://newengine3w.xuezuowang.com/ec_engine/fileManager/fileRead".replaceAll("/ec_engine/fileManager", "/yn-engine/fileManager"));
         PrintWriter res = null;
         try {
         	res = response.getWriter();

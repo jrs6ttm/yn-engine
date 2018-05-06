@@ -99,8 +99,11 @@ public class UserInfoController {//extends BaseSpringController
     public void testJava2(HttpServletRequest request, HttpServletResponse response){  
 		response.setContentType("application/json;charset=utf-8");
 		System.out.println(request.getServerName());
-		System.out.println("http://newengine3w.xuezuowang.com/ec_engine/fileManager/fileRead".replaceAll("/ec_engine/fileManager", "/yn-engine/fileManager"));
-        PrintWriter res = null;
+		System.out.println("PageOffice://|http://newengine3w.xuezuowang.com/NKTOForMyDemo/MyNTKODemo/MyFirstWordEditor.jsp?path=newengine3w.xuezuowang.com/ec_engine/fileManager/fileRead%3FfileId%3Da8d566ab-dec6-48bc-91b7-76727e7327e6%26userId%3D457bff90-135d-11e7-8c55-1f33be1fa07e%26createType%3Down%26ignoreme%3D&amp;fileName=零件结构及加工工艺分析.ppt&amp;permission=r&amp;userName=457bff90-135d-11e7-8c55-1f33be1fa07e"
+				.replaceAll("ec_engine", "yn-engine").replaceAll("\\/NKTOForMyDemo\\/MyNTKODemo\\/MyFirstWordEditor\\.jsp\\?path", "/yn-engine/pageOffice/editFile.jsp?filePath"));
+																  
+		
+		PrintWriter res = null;
         try {
         	res = response.getWriter();
         	res.write("{\"bpmnInstanceId\":\"好好学习\"}");

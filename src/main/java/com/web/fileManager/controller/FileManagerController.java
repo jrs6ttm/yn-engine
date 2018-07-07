@@ -39,7 +39,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.google.gson.Gson;
 import com.util.FileUtils;
 import com.util.ImageUtils;
-import com.util.ReturnCode;
 import com.util.SysLog;
 import com.web.fileManager.entity.ActOwnFile;
 import com.web.fileManager.entity.ActStudyFile;
@@ -171,16 +170,136 @@ public class FileManagerController {
 	 * @throws 
 	 */
 	@RequestMapping(value="/ownFileUploadByContent")  
-    public @ResponseBody String ownFileUploadByContent(HttpServletRequest request){
-		Map<String, String> rMap = new HashMap<String, String>();
+    public @ResponseBody void ownFileUploadByContent(HttpServletRequest request, HttpServletResponse response){
+		String errorMsg = null, fileSize = "0", relativePath = null;
+		
+		PrintWriter res = null;
 		try {
+			response.setHeader("Access-Control-Allow-Origin", "*");
+			//response.setHeader("Content-type", "text/html;charset=UTF-8");
+			response.setCharacterEncoding("utf-8");
+			res = response.getWriter();
 			
+			String userId = request.getParameter("userId");
+			String fileId = request.getParameter("fileId");
+			String fileName = request.getParameter("fileName");
+			String fileStr = request.getParameter("fileStr");
+			
+			if(StringUtils.isBlank(userId) || StringUtils.isBlank(fileName)){
+				errorMsg =  "缺少用户id或文件名，不能保存!";
+			}else{
+				String last = null;
+				UUID uuid = UUID.randomUUID();
+				if(StringUtils.isBlank(fileId)){//create new
+					if(fileName != null && fileName.endsWith(".jm")){
+						last = "jm";
+					}else{
+						fileStr = "<!DOCTYPE html><html><head><meta charset='utf-8' /></head><body>"+fileStr+"</body><html>";
+						last = "html";
+					}
+					relativePath = FileUtils.getFileRelativePath(FileUtils.getFileRootDir(), last, userId, uuid + "." + last, "own");
+					if(relativePath == null){
+						errorMsg = "抱歉，系统不允许格式为【"+last+"】的文件上传，请选择上传其他常规的文件类型！";
+					}
+				}else{//edit
+					ActOwnFile actOwnFile = actOwnFileService.selectByPrimaryKey(fileId);
+					if(actOwnFile == null){
+						errorMsg =  "找不到目标文件，不能保存!";
+					}else{
+						last = actOwnFile.getFiletype().toLowerCase();
+						//如果不是思维导图， 默认就是富文本内容
+						if(!"jm".equals(last)){
+							fileStr = "<!DOCTYPE html><html><head><meta charset='utf-8' /></head><body>"+fileStr+"</body><html>";
+						}
+						relativePath = actOwnFile.getFilepath();
+					}
+				}
+				
+				if(errorMsg == null){
+					int size = fileStr.getBytes().length;
+					if(size <= 1024){
+						fileSize = size + "B";
+					}else if(size <= 1024*1024){
+						fileSize = size / 1024 + "KB";
+					}else if(size <= 1024*1024*1024){
+						fileSize = size/(1024*1024) + "M";
+					}else{
+						fileSize = size/(1024*1024*1024) + "G";
+					}
+					
+					//保存文件内容
+					OutputStream out = new FileOutputStream(new File(FileUtils.getFileRootDir() + File.separator + relativePath));
+					OutputStreamWriter write = new OutputStreamWriter(out, "UTF-8");
+					write.write(fileStr);
+					write.flush();
+					write.close();
+				}
+				
+				if(errorMsg != null){
+					JSONObject errResult = new JSONObject();
+					errResult.put("errorMsg", errorMsg);
+					res.write(errResult.toString());
+					//return errResult.toString();
+				}else{
+					if(StringUtils.isBlank(fileId)){//create new
+						ActOwnFile actOwnFile = new ActOwnFile(null, relativePath, fileName, userId, fileSize, null, last);
+						actOwnFile.setFileid(uuid.toString());
+						
+						if(actOwnFileService.insertSelective(actOwnFile) > 0){
+							SysLog.info(userId, "", new Gson().toJson(actOwnFile));
+							JSONObject result = new JSONObject();
+							result.put("fileId", actOwnFile.getFileid());
+							result.put("filePath", actOwnFile.getFilepath());
+							result.put("fileSize", actOwnFile.getFilesize());
+							result.put("fileType", actOwnFile.getFiletype());
+							result.put("fileName", actOwnFile.getFilename());
+							
+							res.write(result.toString());
+						}else{
+							JSONObject errResult = new JSONObject();
+							errResult.put("errorMsg", "抱歉，你上传的文件的记录保存失败，请尝试重新上传！");
+							SysLog.error(userId, "", errResult.getString("errorMsg"));
+							
+							res.write(errResult.toString());
+						}
+					}else{//update
+						ActOwnFile actOwnFile = actOwnFileService.selectByPrimaryKey(fileId);
+						actOwnFile.setFileid(fileId);
+						actOwnFile.setFilesize(fileSize);
+						actOwnFile.setFilename(fileName);
+						actOwnFile.setLastupdatetime(actOwnFile.getDateStr(null));
+						
+						if(actOwnFileService.updateByPrimaryKeySelective(actOwnFile) > 0){
+							SysLog.info(userId, "", new Gson().toJson(actOwnFile));
+							JSONObject result = new JSONObject();
+							result.put("fileId", actOwnFile.getFileid());
+							result.put("filePath", actOwnFile.getFilepath());
+							result.put("fileSize", actOwnFile.getFilesize());
+							result.put("fileType", actOwnFile.getFiletype());
+							result.put("fileName", actOwnFile.getFilename());
+							
+							res.write(result.toString());
+						}else{
+							JSONObject errResult = new JSONObject();
+							errResult.put("errorMsg", "抱歉，你保存的文件的记录保存失败，请尝试重新保存！");
+							SysLog.error(userId, "", errResult.getString("errorMsg"));
+							
+							res.write(errResult.toString());
+						}
+
+					}
+				}
+			}
 		}catch(Exception e){
 			e.printStackTrace();
-			rMap.put("errorMsg", "保存文件时出现问题！");
+			JSONObject errResult = new JSONObject();
+			errResult.put("errorMsg", "保存文件时出现问题！");
+			res.write(errResult.toString());
+		}finally{
+			if(res != null){
+				res.close();
+			}
 		}
-		
-		return new Gson().toJson(rMap);
 	}
 	
 	/**
@@ -319,10 +438,10 @@ public class FileManagerController {
 						res.write(errResult.toString());
 					}
 				}else{//update
-					ActOwnFile actOwnFile = new ActOwnFile();
+					ActOwnFile actOwnFile = actOwnFileService.selectByPrimaryKey(fileId);
 					actOwnFile.setFileid(fileId);
 					actOwnFile.setFilesize(fileSize);
-					actOwnFile.setFilename(actOwnFile.getCreatetime());
+					actOwnFile.setFilename(fileName);
 					actOwnFile.setLastupdatetime(actOwnFile.getDateStr(null));
 					
 					if(actOwnFileService.updateByPrimaryKeySelective(actOwnFile) > 0){

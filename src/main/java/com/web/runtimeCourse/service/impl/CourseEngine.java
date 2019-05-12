@@ -1605,12 +1605,12 @@ public class CourseEngine {
 				  }
 			  }
 		  }
-	  }else if("VM".equals(toolType)){
+	  }else if("VM".equals(toolType)){//虚拟机
 		  //TODO 创建虚拟机
 		  //String vm_group = 
 		  destData = sourceData;
 		  
-	  }else if("choose".equals(toolType)){
+	  }else if("choose".equals(toolType)){//选择题
 		  destData = sourceData;
 	  }else if("board".equals(toolType)){
 		  destData = sourceData;
@@ -1619,7 +1619,7 @@ public class CourseEngine {
 	  }/*
 	  else if("mindMap".equals(toolType)){//头脑风暴
 		  destData = sourceData;
-	  }*/else if("form".equals(toolType) || "dynamicForm".equals(toolType)){
+	  }*/else if("form".equals(toolType) || "dynamicForm".equals(toolType)){//表单
 		  //检查是否已存在
 		  ActFormRun formRunQuery = new ActFormRun();
 		  formRunQuery.setTaskId(task.getId());
@@ -1636,8 +1636,10 @@ public class CourseEngine {
 			  destData = this.createFormInstance(sourceData, task, toolType);
 		  }
 		  
-	  }else if("comment".equals(toolType)){
+	  }else if("comment".equals(toolType)){//评论
 		  destData = sourceData;
+	  }else if("remote".equals(toolType)){//远程实验室
+	  	  destData = sourceData;
 	  }else{
 		  errorMsg = "时间："+CourseEngine.getDateStr(null)+" <br />错误：未识别的工具类型："+toolType+"!<br />原因：课程文件有错误，请检查此任务的工具类型inputType的正确性。";
 		  //System.out.println(errorMsg);
